@@ -1,29 +1,18 @@
-# Visual Studio
+## Visual Studio
 .vs/
 *.user
-*.userosscache
 *.suo
 
-# Build
-bin/
-obj/
+## Compilación
+[Bb]in/
+[Oo]bj/
 
-# Visual Studio Code
-.vscode/
-
-# Rider
-.idea/
-
-# Logs
+## Paquetes y archivos temporales
+packages/
 *.log
 
-# Sistema operativo
-.DS_Store
-Thumbs.db
+## ASP.NET
+wwwroot/lib/
 
-# Archivos temporales
-*.tmp
-*.temp
-
-# User-specific files
-*.rsuser
+## Variables de entorno
+.env
