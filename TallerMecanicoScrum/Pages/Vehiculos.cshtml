@@ -1,0 +1,236 @@
+﻿@page
+@model TallerMecanicoScrum.Pages.VehiculosModel
+@{
+
+
+
+}
+
+@{
+    ViewData["Title"] = "Vehículos";
+}
+
+<div class="container-fluid">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+            <h2 class="fw-bold mb-1">Vehículos</h2>
+
+            <p class="text-muted mb-0">
+                Registro de vehículos del taller
+            </p>
+        </div>
+
+        <a asp-page="/NuevoVehiculo" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-1"></i>
+            Nuevo Vehículo
+        </a>
+
+    </div>
+
+
+    <div class="card shadow-sm border-0">
+
+        <div class="card-body">
+
+            <div class="row mb-3">
+
+                <div class="col-md-5">
+
+                    <div class="input-group">
+
+                        <span class="input-group-text">
+                            <i class="bi bi-search"></i>
+                        </span>
+
+                        <input type="text"
+                               class="form-control"
+                               placeholder="Buscar vehículo..." />
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle">
+
+                    <thead class="table-light">
+
+                        <tr>
+                            <th>N°</th>
+                            <th>Placa</th>
+                            <th>Marca</th>
+                            <th>Modelo</th>
+                            <th>Año</th>
+                            <th>Color</th>
+                            <th>Cliente</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        @for (int i = 0; i < Model.ListaVehiculos.Count; i++)
+                        {
+                            <tr>
+
+                                <td>
+                                    @(i + 1)
+                                </td>
+
+                                <td class="fw-semibold">
+                                    @Model.ListaVehiculos[i].Placa
+                                </td>
+
+                                <td>
+                                    @Model.ListaVehiculos[i].Marca
+                                </td>
+
+                                <td>
+                                    @Model.ListaVehiculos[i].Modelo
+                                </td>
+
+                                <td>
+                                    @Model.ListaVehiculos[i].Anio
+                                </td>
+
+                                <td>
+                                    @Model.ListaVehiculos[i].Color
+                                </td>
+
+                                <td>
+                                    Cliente @Model.ListaVehiculos[i].ClienteId
+                                </td>
+
+                                <td>
+
+                                    @if (Model.ListaVehiculos[i].Estado)
+                                    {
+                                        <span class="badge bg-success">
+                                            Activo
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">
+                                            Inactivo
+                                        </span>
+                                    }
+
+                                </td>
+
+                                <td>
+
+                                    <a asp-page="/EditarVehiculo"
+                                       asp-route-id="@Model.ListaVehiculos[i].Id"
+                                       class="btn btn-sm btn-warning">
+
+                                        <i class="bi bi-pencil"></i>
+                                        Editar
+
+                                    </a>
+
+                                    <button type="button"
+                                            class="btn btn-sm btn-danger"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#modalEliminar-@Model.ListaVehiculos[i].Id">
+
+                                        <i class="bi bi-trash"></i>
+                                        Eliminar
+                                    </button>
+                                    <div class="modal fade"
+                                         id="modalEliminar-@Model.ListaVehiculos[i].Id"
+                                         tabindex="-1"
+                                         aria-hidden="true">
+
+                                        <div class="modal-dialog modal-dialog-centered">
+
+                                            <div class="modal-content">
+
+                                                <div class="modal-header">
+
+                                                    <h5 class="modal-title">
+                                                        Confirmar eliminación
+                                                    </h5>
+
+                                                    <button type="button"
+                                                            class="btn-close"
+                                                            data-bs-dismiss="modal">
+                                                    </button>
+
+                                                </div>
+
+
+                                                <div class="modal-body">
+
+                                                    ¿Está seguro que desea eliminar el vehículo:
+
+                                                    <strong>
+                                                        @Model.ListaVehiculos[i].Marca
+                                                        @Model.ListaVehiculos[i].Modelo
+                                                        -
+                                                        @Model.ListaVehiculos[i].Placa
+                                                    </strong>?
+
+                                                </div>
+
+
+                                                <div class="modal-footer">
+
+                                                    <button type="button"
+                                                            class="btn btn-secondary"
+                                                            data-bs-dismiss="modal">
+
+                                                        Cancelar
+
+                                                    </button>
+
+
+                                                    <form method="post"
+                                                          asp-page-handler="Eliminar">
+
+                                                        <input type="hidden"
+                                                               name="id"
+                                                               value="@Model.ListaVehiculos[i].Id" />
+
+                                                        <button type="submit"
+                                                                class="btn btn-danger">
+
+                                                            Eliminar
+
+                                                        </button>
+
+                                                    </form>
+
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
