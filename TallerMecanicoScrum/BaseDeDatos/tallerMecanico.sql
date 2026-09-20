@@ -1,7 +1,3 @@
--- =========================================================
--- Sistema de Gestión de Taller Mecánico
--- Script de creación de base de datos (MySQL 8+)
--- =========================================================
 
 CREATE DATABASE IF NOT EXISTS taller_mecanico
   CHARACTER SET utf8mb4
@@ -9,9 +5,6 @@ CREATE DATABASE IF NOT EXISTS taller_mecanico
 
 USE taller_mecanico;
 
--- ---------------------------------------------------------
--- CLIENTE
--- ---------------------------------------------------------
 CREATE TABLE cliente (
     id              INT AUTO_INCREMENT PRIMARY KEY,
     nombre          VARCHAR(120) NOT NULL,
@@ -21,9 +14,6 @@ CREATE TABLE cliente (
     fecha_registro  DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
--- ---------------------------------------------------------
--- VEHICULO
--- ---------------------------------------------------------
 CREATE TABLE vehiculo (
     id              INT AUTO_INCREMENT PRIMARY KEY,
     cliente_id      INT NOT NULL,
@@ -39,9 +29,6 @@ CREATE TABLE vehiculo (
         ON DELETE CASCADE
 );
 
--- ---------------------------------------------------------
--- DANO_VEHICULO (historial de choques / daños previos)
--- ---------------------------------------------------------
 CREATE TABLE dano_vehiculo (
     id              INT AUTO_INCREMENT PRIMARY KEY,
     vehiculo_id     INT NOT NULL,
@@ -53,9 +40,6 @@ CREATE TABLE dano_vehiculo (
         ON DELETE CASCADE
 );
 
--- ---------------------------------------------------------
--- MECANICO
--- ---------------------------------------------------------
 CREATE TABLE mecanico (
     id              INT AUTO_INCREMENT PRIMARY KEY,
     nombre          VARCHAR(120) NOT NULL,
@@ -64,12 +48,6 @@ CREATE TABLE mecanico (
     activo          BOOLEAN DEFAULT TRUE
 );
 
--- ---------------------------------------------------------
--- ORDEN_TRABAJO
--- Ya no se liga directo al vehículo: se llega a ella a través
--- de SERVICIO (una orden agrupa uno o varios servicios solicitados
--- para un mismo vehículo, con sus mecánicos y materiales).
--- ---------------------------------------------------------
 CREATE TABLE orden_trabajo (
     id                    INT AUTO_INCREMENT PRIMARY KEY,
     fecha_ingreso         DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -79,12 +57,6 @@ CREATE TABLE orden_trabajo (
     diagnostico           TEXT
 );
 
--- ---------------------------------------------------------
--- SERVICIO (intermediario entre VEHICULO y ORDEN_TRABAJO)
--- Es lo que el cliente solicita para su vehículo; cuando el
--- taller lo atiende, se le asigna una orden de trabajo donde
--- se definen mecánicos, materiales y cotización.
--- ---------------------------------------------------------
 CREATE TABLE servicio (
     id                    INT AUTO_INCREMENT PRIMARY KEY,
     vehiculo_id           INT NOT NULL,
@@ -100,9 +72,6 @@ CREATE TABLE servicio (
         ON DELETE SET NULL
 );
 
--- ---------------------------------------------------------
--- ORDEN_MECANICO (relación N:M orden <-> mecánico)
--- ---------------------------------------------------------
 CREATE TABLE orden_mecanico (
     orden_id        INT NOT NULL,
     mecanico_id     INT NOT NULL,
@@ -117,9 +86,6 @@ CREATE TABLE orden_mecanico (
         ON DELETE RESTRICT
 );
 
--- ---------------------------------------------------------
--- COTIZACION (con versiones por orden)
--- ---------------------------------------------------------
 CREATE TABLE cotizacion (
     id              INT AUTO_INCREMENT PRIMARY KEY,
     orden_id        INT NOT NULL,
@@ -133,9 +99,6 @@ CREATE TABLE cotizacion (
     UNIQUE KEY uq_orden_version (orden_id, version)
 );
 
--- ---------------------------------------------------------
--- COTIZACION_DETALLE
--- ---------------------------------------------------------
 CREATE TABLE cotizacion_detalle (
     id              INT AUTO_INCREMENT PRIMARY KEY,
     cotizacion_id   INT NOT NULL,
@@ -147,9 +110,6 @@ CREATE TABLE cotizacion_detalle (
         ON DELETE CASCADE
 );
 
--- ---------------------------------------------------------
--- PRODUCTO (repuestos / insumos: aceite, grasa, filtros, etc.)
--- ---------------------------------------------------------
 CREATE TABLE producto (
     id              INT AUTO_INCREMENT PRIMARY KEY,
     nombre          VARCHAR(120) NOT NULL,
@@ -158,9 +118,6 @@ CREATE TABLE producto (
     stock           INT NOT NULL DEFAULT 0
 );
 
--- ---------------------------------------------------------
--- ORDEN_PRODUCTO (repuestos usados en una orden)
--- ---------------------------------------------------------
 CREATE TABLE orden_producto (
     orden_id        INT NOT NULL,
     producto_id     INT NOT NULL,
@@ -175,9 +132,6 @@ CREATE TABLE orden_producto (
         ON DELETE RESTRICT
 );
 
--- ---------------------------------------------------------
--- VENTA_DIRECTA (venta de productos en mostrador, sin orden)
--- ---------------------------------------------------------
 CREATE TABLE venta_directa (
     id              INT AUTO_INCREMENT PRIMARY KEY,
     cliente_id      INT NULL,
@@ -201,9 +155,6 @@ CREATE TABLE venta_directa_detalle (
         ON DELETE RESTRICT
 );
 
--- ---------------------------------------------------------
--- PAGO
--- ---------------------------------------------------------
 CREATE TABLE pago (
     id              INT AUTO_INCREMENT PRIMARY KEY,
     orden_id        INT NOT NULL,
@@ -216,9 +167,6 @@ CREATE TABLE pago (
         ON DELETE CASCADE
 );
 
--- ---------------------------------------------------------
--- MOVIMIENTO_INVENTARIO (kardex: entradas y salidas de stock)
--- ---------------------------------------------------------
 CREATE TABLE movimiento_inventario (
     id                INT AUTO_INCREMENT PRIMARY KEY,
     producto_id       INT NOT NULL,
@@ -233,9 +181,6 @@ CREATE TABLE movimiento_inventario (
         ON DELETE RESTRICT
 );
 
--- ---------------------------------------------------------
--- Índices adicionales útiles para búsquedas frecuentes
--- ---------------------------------------------------------
 CREATE INDEX idx_vehiculo_placa ON vehiculo(placa);
 CREATE INDEX idx_cliente_telefono ON cliente(telefono);
 CREATE INDEX idx_orden_estado ON orden_trabajo(estado);
@@ -243,16 +188,9 @@ CREATE INDEX idx_servicio_vehiculo ON servicio(vehiculo_id);
 CREATE INDEX idx_servicio_orden ON servicio(orden_trabajo_id);
 CREATE INDEX idx_movimiento_producto ON movimiento_inventario(producto_id);
 CREATE INDEX idx_movimiento_fecha ON movimiento_inventario(fecha);
--- =========================================================
--- Datos de ejemplo (inventados) para taller_mecanico
--- Respeta el orden de dependencias de las FK
--- =========================================================
 
 USE taller_mecanico;
 
--- ---------------------------------------------------------
--- CLIENTE
--- ---------------------------------------------------------
 INSERT INTO cliente (id, nombre, telefono, email, direccion) VALUES
 (1, 'Carlos Mamani',   '71234567', 'carlos.mamani@gmail.com',   'Av. Heroínas 123, Cochabamba'),
 (2, 'María Fernández', '70112233', 'maria.fernandez@hotmail.com','Calle España 456, Cochabamba'),
@@ -265,9 +203,6 @@ INSERT INTO cliente (id, nombre, telefono, email, direccion) VALUES
 (9, 'Ricardo Paz',     '71122334', 'ricardo.paz@gmail.com',     'Av. Melchor Pérez 700, Cochabamba'),
 (10,'Daniela Rojas',   '78877665', 'daniela.rojas@gmail.com',   'Calle Junín 210, Cochabamba');
 
--- ---------------------------------------------------------
--- VEHICULO
--- ---------------------------------------------------------
 INSERT INTO vehiculo (id, cliente_id, placa, marca, modelo, anio, color, kilometraje) VALUES
 (1, 1,  '1234ABC', 'Toyota',     'Corolla',  2015, 'Blanco', 85000),
 (2, 2,  '5678BCD', 'Nissan',     'Sentra',   2018, 'Gris',   42000),
@@ -280,9 +215,6 @@ INSERT INTO vehiculo (id, cliente_id, placa, marca, modelo, anio, color, kilomet
 (9, 9,  '7531IJK', 'Mitsubishi', 'Lancer',   2014, 'Gris',   95000),
 (10,10, '6420JKL', 'Toyota',     'Yaris',    2019, 'Blanco', 28000);
 
--- ---------------------------------------------------------
--- DANO_VEHICULO
--- ---------------------------------------------------------
 INSERT INTO dano_vehiculo (id, vehiculo_id, descripcion, fecha) VALUES
 (1, 1,  'Rayón en la puerta izquierda', '2023-05-10'),
 (2, 1,  'Golpe leve en parachoques trasero', '2024-01-15'),
@@ -295,9 +227,6 @@ INSERT INTO dano_vehiculo (id, vehiculo_id, descripcion, fecha) VALUES
 (9, 2,  'Rayón superficial en el techo', '2023-12-01'),
 (10,10, 'Abolladura leve en la puerta del copiloto', '2024-04-22');
 
--- ---------------------------------------------------------
--- MECANICO
--- ---------------------------------------------------------
 INSERT INTO mecanico (id, nombre, especialidad, telefono, activo) VALUES
 (1, 'Juan Pérez',       'Motor',                    '70011122', TRUE),
 (2, 'Luis Gutiérrez',   'Frenos y suspensión',      '70022233', TRUE),
@@ -310,9 +239,6 @@ INSERT INTO mecanico (id, nombre, especialidad, telefono, activo) VALUES
 (9, 'Víctor Salazar',   'Motor',                    '70099900', TRUE),
 (10,'Adrián Cárdenas',  'Carrocería y pintura',     '70100011', TRUE);
 
--- ---------------------------------------------------------
--- ORDEN_TRABAJO
--- ---------------------------------------------------------
 INSERT INTO orden_trabajo (id, fecha_ingreso, estado, diagnostico) VALUES
 (1, '2024-05-02 08:30:00', 'terminado',   'Cambio de aceite y filtro, todo en orden'),
 (2, '2024-05-03 09:15:00', 'entregado',   'Pastillas de freno desgastadas, se reemplazaron'),
@@ -325,9 +251,6 @@ INSERT INTO orden_trabajo (id, fecha_ingreso, estado, diagnostico) VALUES
 (9, '2024-05-12 12:00:00', 'terminado',   'Alineación y balanceo realizados'),
 (10,'2024-05-14 08:10:00', 'en_proceso',  'Cambio de correa de distribución en curso');
 
--- ---------------------------------------------------------
--- SERVICIO
--- ---------------------------------------------------------
 INSERT INTO servicio (id, vehiculo_id, orden_trabajo_id, tipo_servicio, descripcion_solicitud, fecha_solicitud) VALUES
 (1, 1,  1,    'preventivo',      'Cambio de aceite y filtro', '2024-05-01 16:00:00'),
 (2, 2,  2,    'correctivo',      'Ruido al frenar', '2024-05-02 17:30:00'),
@@ -340,9 +263,6 @@ INSERT INTO servicio (id, vehiculo_id, orden_trabajo_id, tipo_servicio, descripc
 (9, 9,  9,    'revision_simple', 'Vehículo se desvía al frenar', '2024-05-11 08:30:00'),
 (10,10, 10,   'correctivo',      'Ruido en el motor al arrancar', '2024-05-13 09:45:00');
 
--- ---------------------------------------------------------
--- ORDEN_MECANICO
--- ---------------------------------------------------------
 INSERT INTO orden_mecanico (orden_id, mecanico_id, es_responsable, parte_asignada) VALUES
 (1, 1, TRUE,  'Cambio de aceite y filtro'),
 (2, 2, TRUE,  'Cambio de pastillas de freno'),
@@ -357,9 +277,6 @@ INSERT INTO orden_mecanico (orden_id, mecanico_id, es_responsable, parte_asignad
 (9, 2, TRUE,  'Alineación y balanceo'),
 (10,5, TRUE,  'Cambio de correa de distribución');
 
--- ---------------------------------------------------------
--- COTIZACION
--- ---------------------------------------------------------
 INSERT INTO cotizacion (id, orden_id, version, monto_total, estado, fecha) VALUES
 (1, 1,  1, 250.00,  'aprobada',  '2024-05-02 09:00:00'),
 (2, 2,  1, 480.00,  'aprobada',  '2024-05-03 10:00:00'),
@@ -372,9 +289,6 @@ INSERT INTO cotizacion (id, orden_id, version, monto_total, estado, fecha) VALUE
 (9, 10, 1, 540.00,  'pendiente', '2024-05-14 09:00:00'),
 (10,6,  1, 90.00,   'rechazada', '2024-05-09 10:30:00');
 
--- ---------------------------------------------------------
--- COTIZACION_DETALLE
--- ---------------------------------------------------------
 INSERT INTO cotizacion_detalle (id, cotizacion_id, descripcion, tipo, monto) VALUES
 (1, 1, 'Mano de obra cambio de aceite',              'mano_obra', 80.00),
 (2, 1, 'Aceite y filtro',                            'repuesto',  170.00),
@@ -387,9 +301,6 @@ INSERT INTO cotizacion_detalle (id, cotizacion_id, descripcion, tipo, monto) VAL
 (9, 8, 'Alineación y balanceo',                      'mano_obra', 220.00),
 (10,9, 'Correa de distribución y mano de obra',      'repuesto',  540.00);
 
--- ---------------------------------------------------------
--- PRODUCTO
--- ---------------------------------------------------------
 INSERT INTO producto (id, nombre, categoria, precio, stock) VALUES
 (1, 'Aceite de motor 20W-50 (1L)',      'Lubricantes', 45.00,  120),
 (2, 'Filtro de aceite',                 'Filtros',     25.00,  80),
@@ -402,9 +313,6 @@ INSERT INTO producto (id, nombre, categoria, precio, stock) VALUES
 (9, 'Batería 12V 60Ah',                 'Eléctrico',   480.00, 10),
 (10,'Bujías (juego x4)',                'Eléctrico',   90.00,  50);
 
--- ---------------------------------------------------------
--- ORDEN_PRODUCTO
--- ---------------------------------------------------------
 INSERT INTO orden_producto (orden_id, producto_id, cantidad, precio_unitario) VALUES
 (1, 1, 3, 45.00),
 (1, 2, 1, 25.00),
@@ -417,9 +325,6 @@ INSERT INTO orden_producto (orden_id, producto_id, cantidad, precio_unitario) VA
 (10,8, 1, 320.00),
 (10,7, 1, 35.00);
 
--- ---------------------------------------------------------
--- VENTA_DIRECTA
--- ---------------------------------------------------------
 INSERT INTO venta_directa (id, cliente_id, fecha) VALUES
 (1, 2,    '2024-05-01 12:00:00'),
 (2, 5,    '2024-05-02 13:30:00'),
@@ -432,9 +337,6 @@ INSERT INTO venta_directa (id, cliente_id, fecha) VALUES
 (9, NULL, '2024-05-09 14:10:00'),
 (10,6,    '2024-05-10 09:30:00');
 
--- ---------------------------------------------------------
--- VENTA_DIRECTA_DETALLE
--- ---------------------------------------------------------
 INSERT INTO venta_directa_detalle (venta_id, producto_id, cantidad, precio_unitario) VALUES
 (1, 1, 2, 45.00),
 (1, 6, 1, 20.00),
@@ -447,9 +349,6 @@ INSERT INTO venta_directa_detalle (venta_id, producto_id, cantidad, precio_unita
 (8, 4, 1, 180.00),
 (9, 6, 2, 20.00);
 
--- ---------------------------------------------------------
--- PAGO
--- ---------------------------------------------------------
 INSERT INTO pago (id, orden_id, monto, metodo, tipo, fecha) VALUES
 (1, 1,  250.00,  'efectivo',      'total_100',   '2024-05-02 12:00:00'),
 (2, 2,  120.00,  'tarjeta',       'anticipo_25', '2024-05-03 11:00:00'),
@@ -462,9 +361,6 @@ INSERT INTO pago (id, orden_id, monto, metodo, tipo, fecha) VALUES
 (9, 4,  75.00,   'efectivo',      'anticipo_25', '2024-05-06 13:00:00'),
 (10,5,  45.00,   'efectivo',      'anticipo_25', '2024-05-08 10:00:00');
 
--- ---------------------------------------------------------
--- MOVIMIENTO_INVENTARIO
--- ---------------------------------------------------------
 INSERT INTO movimiento_inventario (id, producto_id, tipo_movimiento, cantidad, motivo, referencia_id, fecha, stock_resultante) VALUES
 (1, 1, 'entrada', 50, 'compra',          NULL, '2024-04-25 09:00:00', 170),
 (2, 1, 'salida',  3,  'uso_orden',       1,    '2024-05-02 10:15:00', 167),
