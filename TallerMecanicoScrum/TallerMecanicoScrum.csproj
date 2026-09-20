@@ -6,4 +6,14 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Folder Include="BaseDeDatos\" />
+    <Folder Include="Frontend\" />
+    <Folder Include="Backend\" />
+    <Folder Include="Clases\" />
+    <Folder Include="Debugging\" />
+    <Folder Include="Documentacion\" />
+    <Folder Include="Validacion\" />
+  </ItemGroup>
+
 </Project>

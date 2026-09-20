@@ -1,18 +1,35 @@
-## Visual Studio
+# Visual Studio
 .vs/
 *.user
+*.userosscache
 *.suo
+*.userprefs
 
-## Compilación
+# Build
 [Bb]in/
 [Oo]bj/
 
-## Paquetes y archivos temporales
-packages/
+# Visual Studio Code
+.vscode/
+
+# Rider
+.idea/
+
+# Logs
 *.log
 
-## ASP.NET
-wwwroot/lib/
+# Sistema operativo
+.DS_Store
+Thumbs.db
 
-## Variables de entorno
-.env
+# Archivos temporales
+*.tmp
+*.temp
+
+# ReSharper
+_ReSharper*/
+*.[Rr]e[Ss]harper
+
+# NuGet
+*.nupkg
+packages/

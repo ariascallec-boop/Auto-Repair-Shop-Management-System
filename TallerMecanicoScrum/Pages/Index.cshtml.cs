@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using MySql.Data.MySqlClient;
 
 namespace TallerMecanicoScrum.Pages
 {
+    
     public class IndexModel : PageModel
     {
         public List<VehiculoResumen> Vehiculos { get; set; }
