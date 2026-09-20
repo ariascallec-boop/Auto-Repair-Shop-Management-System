@@ -6,8 +6,7 @@ namespace TallerMecanicoScrum.Pages
 {
     public class ClientesModel : PageModel
     {
-        public List<Cliente> ListaClientes { get; set; }
-            = new List<Cliente>();
+        public List<Cliente> ListaClientes { get; set; } = new List<Cliente>();
 
         public string Buscar { get; set; } = "";
 
@@ -22,10 +21,12 @@ namespace TallerMecanicoScrum.Pages
                 BuscarClientes();
             }
         }
+
         public IActionResult OnPostEliminar(int id)
         {
-            // Más adelante se actualizará el estado del cliente a false
-            // para realizar un borrado lógico.
+            // Backend:
+            // aquí se actualizará Estado = false
+            // para realizar el borrado lógico.
 
             return RedirectToPage("/Clientes");
         }
@@ -39,6 +40,7 @@ namespace TallerMecanicoScrum.Pages
                 Apellido = "Perez",
                 CiNit = "1234567",
                 Telefono = "70707070",
+                Email = "juan.perez@gmail.com",
                 Direccion = "Av. Blanco Galindo",
                 Estado = true
             });
@@ -50,6 +52,7 @@ namespace TallerMecanicoScrum.Pages
                 Apellido = "Gomez",
                 CiNit = "7654321",
                 Telefono = "71717171",
+                Email = "maria.gomez@gmail.com",
                 Direccion = "Av. America",
                 Estado = true
             });
@@ -61,6 +64,7 @@ namespace TallerMecanicoScrum.Pages
                 Apellido = "Sanchez",
                 CiNit = "4567890",
                 Telefono = "72727272",
+                Email = "pedro.sanchez@gmail.com",
                 Direccion = "Av. Beijing",
                 Estado = true
             });
@@ -84,6 +88,11 @@ namespace TallerMecanicoScrum.Pages
                     ) ||
 
                     ListaClientes[i].CiNit.Contains(
+                        Buscar,
+                        StringComparison.OrdinalIgnoreCase
+                    ) ||
+
+                    ListaClientes[i].Email.Contains(
                         Buscar,
                         StringComparison.OrdinalIgnoreCase
                     )

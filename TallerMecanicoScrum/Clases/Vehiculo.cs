@@ -14,8 +14,14 @@
 
         public string Color { get; set; } = "";
 
+        public string Tipo { get; set; } = "";
+
+        public int Kilometraje { get; set; }
+
         public int ClienteId { get; set; }
 
         public bool Estado { get; set; } = true;
+
+        public DateTime CreadoEn { get; set; }
     }
 }

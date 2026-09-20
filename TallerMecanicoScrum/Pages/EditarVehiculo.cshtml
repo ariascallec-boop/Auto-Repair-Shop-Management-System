@@ -19,7 +19,6 @@
 
     </div>
 
-
     <div class="card shadow-sm border-0">
 
         <div class="card-body">
@@ -29,9 +28,7 @@
                 <input type="hidden"
                        asp-for="Vehiculo.Id" />
 
-
                 <div class="row g-3">
-
 
                     <div class="col-md-6">
 
@@ -44,7 +41,6 @@
 
                     </div>
 
-
                     <div class="col-md-6">
 
                         <label class="form-label">
@@ -55,7 +51,6 @@
                                class="form-control" />
 
                     </div>
-
 
                     <div class="col-md-6">
 
@@ -68,7 +63,6 @@
 
                     </div>
 
-
                     <div class="col-md-6">
 
                         <label class="form-label">
@@ -76,10 +70,10 @@
                         </label>
 
                         <input asp-for="Vehiculo.Anio"
+                               type="number"
                                class="form-control" />
 
                     </div>
-
 
                     <div class="col-md-6">
 
@@ -92,6 +86,50 @@
 
                     </div>
 
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            Tipo
+                        </label>
+
+                        <select asp-for="Vehiculo.Tipo"
+                                class="form-select">
+
+                            <option value="Sedán">
+                                Sedán
+                            </option>
+
+                            <option value="SUV">
+                                SUV
+                            </option>
+
+                            <option value="Camioneta">
+                                Camioneta
+                            </option>
+
+                            <option value="Hatchback">
+                                Hatchback
+                            </option>
+
+                            <option value="Van">
+                                Van
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            Kilometraje
+                        </label>
+
+                        <input asp-for="Vehiculo.Kilometraje"
+                               type="number"
+                               class="form-control" />
+
+                    </div>
 
                     <div class="col-md-6">
 
@@ -118,12 +156,9 @@
 
                     </div>
 
-
                 </div>
 
-
                 <hr class="my-4" />
-
 
                 <div class="d-flex justify-content-end gap-2">
 
@@ -133,7 +168,6 @@
                         Cancelar
 
                     </a>
-
 
                     <button type="submit"
                             class="btn btn-primary">

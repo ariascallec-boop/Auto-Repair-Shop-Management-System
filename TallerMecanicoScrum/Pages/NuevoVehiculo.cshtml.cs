@@ -17,7 +17,8 @@ namespace TallerMecanicoScrum.Pages
         {
             Vehiculo.Estado = true;
 
-            // Después aquí se guardará en la base de datos.
+            // Backend:
+            // aquí se guardará el vehículo en la base de datos.
 
             return RedirectToPage("/Vehiculos");
         }
