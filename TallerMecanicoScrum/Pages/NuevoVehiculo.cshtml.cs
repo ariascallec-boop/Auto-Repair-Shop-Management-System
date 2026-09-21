@@ -22,6 +22,8 @@ namespace TallerMecanicoScrum.Pages
 
         public List<string> ListaClientes { get; set; } = new List<string>();
 
+        public string Mensaje { get; set; } = "";
+
         public void OnGet()
         {
             CargarClientes();
@@ -35,22 +37,34 @@ namespace TallerMecanicoScrum.Pages
 
             if (!Validaciones.ValidarPlaca(Vehiculo.Placa))
             {
-                ModelState.AddModelError("Vehiculo.Placa", "La placa debe tener 3 o 4 números seguidos de 3 letras");
+                ModelState.AddModelError(
+                    "Vehiculo.Placa",
+                    "La placa debe tener 3 o 4 números seguidos de 3 letras"
+                );
             }
 
             if (!Validaciones.LetrasEspaciosGuion(Vehiculo.Marca))
             {
-                ModelState.AddModelError("Vehiculo.Marca", "La marca solo puede contener letras, espacios y guiones");
+                ModelState.AddModelError(
+                    "Vehiculo.Marca",
+                    "La marca solo puede contener letras, espacios y guiones"
+                );
             }
 
             if (!Validaciones.LetrasNumerosEspaciosGuion(Vehiculo.Modelo))
             {
-                ModelState.AddModelError("Vehiculo.Modelo", "El modelo solo puede contener letras, números, espacios y guiones");
+                ModelState.AddModelError(
+                    "Vehiculo.Modelo",
+                    "El modelo solo puede contener letras, números, espacios y guiones"
+                );
             }
 
             if (!Validaciones.SoloLetras(Vehiculo.Color))
             {
-                ModelState.AddModelError("Vehiculo.Color", "El color solo puede contener letras");
+                ModelState.AddModelError(
+                    "Vehiculo.Color",
+                    "El color solo puede contener letras"
+                );
             }
 
             int clienteId = BuscarClienteId(ClienteSeleccionado);
@@ -59,7 +73,10 @@ namespace TallerMecanicoScrum.Pages
 
             if (clienteId == 0)
             {
-                ModelState.AddModelError("ClienteSeleccionado", "Debe seleccionar un cliente válido");
+                ModelState.AddModelError(
+                    "ClienteSeleccionado",
+                    "Debe seleccionar un cliente válido"
+                );
             }
             else
             {
@@ -68,11 +85,15 @@ namespace TallerMecanicoScrum.Pages
 
             if (PlacaExiste(Vehiculo.Placa))
             {
-                ModelState.AddModelError("Vehiculo.Placa", "La placa ya se encuentra registrada");
+                ModelState.AddModelError(
+                    "Vehiculo.Placa",
+                    "La placa ya se encuentra registrada"
+                );
             }
 
             if (!ModelState.IsValid)
             {
+                Mensaje = "Hay datos inválidos en el formulario.";
                 CargarClientes();
                 return Page();
             }
@@ -88,28 +109,46 @@ namespace TallerMecanicoScrum.Pages
                                  VALUES
                                  (@placa, @marca, @modelo, @anio, @color, @tipo, @kilometraje, @cliente_id, @estado)";
 
-                using MySqlCommand cmd = new MySqlCommand(query, _connection);
+                using (MySqlCommand cmd = new MySqlCommand(query, _connection))
+                {
+                    cmd.Parameters.AddWithValue("@placa", Vehiculo.Placa);
+                    cmd.Parameters.AddWithValue("@marca", Vehiculo.Marca ?? "");
+                    cmd.Parameters.AddWithValue("@modelo", Vehiculo.Modelo ?? "");
+                    cmd.Parameters.AddWithValue("@anio", Vehiculo.Anio);
+                    cmd.Parameters.AddWithValue("@color", Vehiculo.Color ?? "");
+                    cmd.Parameters.AddWithValue("@tipo", Vehiculo.Tipo ?? "");
+                    cmd.Parameters.AddWithValue("@kilometraje", Vehiculo.Kilometraje);
+                    cmd.Parameters.AddWithValue("@cliente_id", Vehiculo.ClienteId);
+                    cmd.Parameters.AddWithValue("@estado", Vehiculo.Estado);
 
-                cmd.Parameters.AddWithValue("@placa", Vehiculo.Placa);
-                cmd.Parameters.AddWithValue("@marca", Vehiculo.Marca);
-                cmd.Parameters.AddWithValue("@modelo", Vehiculo.Modelo);
-                cmd.Parameters.AddWithValue("@anio", Vehiculo.Anio);
-                cmd.Parameters.AddWithValue("@color", Vehiculo.Color);
-                cmd.Parameters.AddWithValue("@tipo", Vehiculo.Tipo);
-                cmd.Parameters.AddWithValue("@kilometraje", Vehiculo.Kilometraje);
-                cmd.Parameters.AddWithValue("@cliente_id", Vehiculo.ClienteId);
-                cmd.Parameters.AddWithValue("@estado", Vehiculo.Estado);
+                    int filas = cmd.ExecuteNonQuery();
 
-                cmd.ExecuteNonQuery();
+                    if (filas > 0)
+                    {
+                        return RedirectToPage("/Vehiculos");
+                    }
+
+                    Mensaje = "No se pudo registrar el vehículo.";
+                    return Page();
+                }
+            }
+            catch (MySqlException ex)
+            {
+                ModelState.AddModelError(
+                    "",
+                    "Error de MySQL: " + ex.Message
+                );
+
+                CargarClientes();
+                return Page();
             }
             catch (Exception ex)
             {
-                if (_connection.State == System.Data.ConnectionState.Open)
-                {
-                    _connection.Close();
-                }
+                ModelState.AddModelError(
+                    "",
+                    "Error al guardar el vehículo: " + ex.Message
+                );
 
-                ModelState.AddModelError("", "Error al guardar el vehículo: " + ex.Message);
                 CargarClientes();
                 return Page();
             }
@@ -120,8 +159,6 @@ namespace TallerMecanicoScrum.Pages
                     _connection.Close();
                 }
             }
-
-            return RedirectToPage("/Vehiculos");
         }
 
         private void CargarClientes()
@@ -137,13 +174,19 @@ namespace TallerMecanicoScrum.Pages
                                  WHERE estado = 1
                                  ORDER BY nombre, apellido";
 
-                using MySqlCommand cmd = new MySqlCommand(query, _connection);
-                using MySqlDataReader reader = cmd.ExecuteReader();
-
-                while (reader.Read())
+                using (MySqlCommand cmd = new MySqlCommand(query, _connection))
+                using (MySqlDataReader reader = cmd.ExecuteReader())
                 {
-                    string cliente = reader["nombre"].ToString() + " " + reader["apellido"].ToString() + " - CI/NIT: " + reader["ci_nit"].ToString();
-                    ListaClientes.Add(cliente);
+                    while (reader.Read())
+                    {
+                        string cliente =
+                            reader["nombre"].ToString() + " " +
+                            reader["apellido"].ToString() +
+                            " - CI/NIT: " +
+                            reader["ci_nit"].ToString();
+
+                        ListaClientes.Add(cliente);
+                    }
                 }
             }
             finally
@@ -173,14 +216,16 @@ namespace TallerMecanicoScrum.Pages
                                  WHERE CONCAT(nombre, ' ', apellido, ' - CI/NIT: ', ci_nit) = @cliente
                                  AND estado = 1";
 
-                using MySqlCommand cmd = new MySqlCommand(query, _connection);
-                cmd.Parameters.AddWithValue("@cliente", clienteSeleccionado);
-
-                object? resultado = cmd.ExecuteScalar();
-
-                if (resultado != null)
+                using (MySqlCommand cmd = new MySqlCommand(query, _connection))
                 {
-                    clienteId = Convert.ToInt32(resultado);
+                    cmd.Parameters.AddWithValue("@cliente", clienteSeleccionado);
+
+                    object? resultado = cmd.ExecuteScalar();
+
+                    if (resultado != null)
+                    {
+                        clienteId = Convert.ToInt32(resultado);
+                    }
                 }
             }
             finally
@@ -206,14 +251,16 @@ namespace TallerMecanicoScrum.Pages
                                  FROM vehiculo
                                  WHERE placa = @placa";
 
-                using MySqlCommand cmd = new MySqlCommand(query, _connection);
-                cmd.Parameters.AddWithValue("@placa", placa);
-
-                int cantidad = Convert.ToInt32(cmd.ExecuteScalar());
-
-                if (cantidad > 0)
+                using (MySqlCommand cmd = new MySqlCommand(query, _connection))
                 {
-                    existe = true;
+                    cmd.Parameters.AddWithValue("@placa", placa);
+
+                    int cantidad = Convert.ToInt32(cmd.ExecuteScalar());
+
+                    if (cantidad > 0)
+                    {
+                        existe = true;
+                    }
                 }
             }
             finally
