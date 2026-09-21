@@ -1,108 +1,145 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using MySql.Data.MySqlClient;
 using TallerMecanicoScrum.Clases;
 
 namespace TallerMecanicoScrum.Pages
 {
     public class ClientesModel : PageModel
     {
+        private readonly MySqlConnection _connection;
+
+        public ClientesModel(MySqlConnection connection)
+        {
+            _connection = connection;
+        }
+
         public List<Cliente> ListaClientes { get; set; } = new List<Cliente>();
 
+        [BindProperty(SupportsGet = true)]
         public string Buscar { get; set; } = "";
 
         public void OnGet(string buscar)
         {
-            CargarClientes();
-
             Buscar = buscar ?? "";
 
             if (!string.IsNullOrWhiteSpace(Buscar))
             {
                 BuscarClientes();
             }
+            else
+            {
+                CargarClientes();
+            }
         }
 
         public IActionResult OnPostEliminar(int id)
         {
-            // Backend:
-            // aquí se actualizará Estado = false
-            // para realizar el borrado lógico.
+            try
+            {
+                _connection.Open();
+
+                // Borrado lógico usando 'id' en lugar de 'id_cliente'
+                string query = "UPDATE cliente SET estado = 0 WHERE id = @id";
+
+                using (MySqlCommand cmd = new MySqlCommand(query, _connection))
+                {
+                    cmd.Parameters.AddWithValue("@id", id);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+            finally
+            {
+                _connection.Close();
+            }
 
             return RedirectToPage("/Clientes");
         }
 
         private void CargarClientes()
         {
-            ListaClientes.Add(new Cliente
-            {
-                Id = 1,
-                Nombre = "Juan",
-                Apellido = "Perez",
-                CiNit = "1234567",
-                Telefono = "70707070",
-                Email = "juan.perez@gmail.com",
-                Direccion = "Av. Blanco Galindo",
-                Estado = true
-            });
+            ListaClientes.Clear();
 
-            ListaClientes.Add(new Cliente
+            try
             {
-                Id = 2,
-                Nombre = "Maria",
-                Apellido = "Gomez",
-                CiNit = "7654321",
-                Telefono = "71717171",
-                Email = "maria.gomez@gmail.com",
-                Direccion = "Av. America",
-                Estado = true
-            });
+                _connection.Open();
 
-            ListaClientes.Add(new Cliente
+                // Seleccionamos 'id' ajustado a tu esquema real
+                string query = @"SELECT id, ci_nit, nombre, apellido, telefono, email, direccion, estado 
+                                 FROM cliente 
+                                 WHERE estado = 1";
+
+                using (MySqlCommand cmd = new MySqlCommand(query, _connection))
+                {
+                    using (MySqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            ListaClientes.Add(new Cliente
+                            {
+                                Id = Convert.ToInt32(reader["id"]),
+                                CiNit = reader["ci_nit"]?.ToString() ?? "",
+                                Nombre = reader["nombre"]?.ToString() ?? "",
+                                Apellido = reader["apellido"]?.ToString() ?? "",
+                                Telefono = reader["telefono"]?.ToString() ?? "",
+                                Email = reader["email"]?.ToString() ?? "",
+                                Direccion = reader["direccion"]?.ToString() ?? "",
+                                Estado = Convert.ToBoolean(reader["estado"])
+                            });
+                        }
+                    }
+                }
+            }
+            finally
             {
-                Id = 3,
-                Nombre = "Pedro",
-                Apellido = "Sanchez",
-                CiNit = "4567890",
-                Telefono = "72727272",
-                Email = "pedro.sanchez@gmail.com",
-                Direccion = "Av. Beijing",
-                Estado = true
-            });
+                _connection.Close();
+            }
         }
 
         private void BuscarClientes()
         {
-            List<Cliente> resultado = new List<Cliente>();
+            ListaClientes.Clear();
 
-            for (int i = 0; i < ListaClientes.Count; i++)
+            try
             {
-                if (
-                    ListaClientes[i].Nombre.Contains(
-                        Buscar,
-                        StringComparison.OrdinalIgnoreCase
-                    ) ||
+                _connection.Open();
 
-                    ListaClientes[i].Apellido.Contains(
-                        Buscar,
-                        StringComparison.OrdinalIgnoreCase
-                    ) ||
+                string query = @"SELECT id, ci_nit, nombre, apellido, telefono, email, direccion, estado 
+                                 FROM cliente 
+                                 WHERE estado = 1 AND (
+                                     nombre LIKE @buscar OR 
+                                     apellido LIKE @buscar OR 
+                                     ci_nit LIKE @buscar OR 
+                                     email LIKE @buscar
+                                 )";
 
-                    ListaClientes[i].CiNit.Contains(
-                        Buscar,
-                        StringComparison.OrdinalIgnoreCase
-                    ) ||
-
-                    ListaClientes[i].Email.Contains(
-                        Buscar,
-                        StringComparison.OrdinalIgnoreCase
-                    )
-                )
+                using (MySqlCommand cmd = new MySqlCommand(query, _connection))
                 {
-                    resultado.Add(ListaClientes[i]);
+                    cmd.Parameters.AddWithValue("@buscar", "%" + Buscar + "%");
+
+                    using (MySqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            ListaClientes.Add(new Cliente
+                            {
+                                Id = Convert.ToInt32(reader["id"]),
+                                CiNit = reader["ci_nit"]?.ToString() ?? "",
+                                Nombre = reader["nombre"]?.ToString() ?? "",
+                                Apellido = reader["apellido"]?.ToString() ?? "",
+                                Telefono = reader["telefono"]?.ToString() ?? "",
+                                Email = reader["email"]?.ToString() ?? "",
+                                Direccion = reader["direccion"]?.ToString() ?? "",
+                                Estado = Convert.ToBoolean(reader["estado"])
+                            });
+                        }
+                    }
                 }
             }
-
-            ListaClientes = resultado;
+            finally
+            {
+                _connection.Close();
+            }
         }
     }
 }
