@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using MySql.Data.MySqlClient;
 using TallerMecanicoScrum.Clases;
+using System.Text.RegularExpressions;
 
 namespace TallerMecanicoScrum.Pages
 {
@@ -39,8 +40,9 @@ namespace TallerMecanicoScrum.Pages
             }
             catch
             {
-                // Si el token fue modificado, es invÃ¡lido o no puede
-                // convertirse correctamente, no se permite continuar.
+                // Si el token fue modificado, es inválido
+                // o no puede convertirse correctamente,
+                // no se permite continuar.
                 return RedirectToPage("/Clientes");
             }
 
@@ -48,8 +50,8 @@ namespace TallerMecanicoScrum.Pages
             {
                 _connection.Open();
 
-                string query = @"SELECT id, ci_nit, nombre, apellido, telefono, email, direccion, estado 
-                                 FROM cliente 
+                string query = @"SELECT id, ci_nit, nombre, apellido, telefono, email, direccion, estado
+                                 FROM cliente
                                  WHERE id = @id";
 
                 using (MySqlCommand cmd = new MySqlCommand(query, _connection))
@@ -92,8 +94,27 @@ namespace TallerMecanicoScrum.Pages
 
         public IActionResult OnPost()
         {
+            // Limpiamos espacios al principio y al final.
+            Cliente.Nombre = Cliente.Nombre?.Trim();
+            Cliente.Apellido = Cliente.Apellido?.Trim();
+            Cliente.CiNit = Cliente.CiNit?.Trim();
+            Cliente.Telefono = Cliente.Telefono?.Trim();
+            Cliente.Email = Cliente.Email?.Trim();
+            Cliente.Direccion = Cliente.Direccion?.Trim();
+
             if (!ModelState.IsValid)
             {
+                return Page();
+            }
+
+            // Validación adicional del CI/NIT.
+            if (!string.IsNullOrWhiteSpace(Cliente.CiNit) &&
+                !Regex.IsMatch(Cliente.CiNit, "^[0-9]+$"))
+            {
+                ModelState.AddModelError(
+                    "Cliente.CiNit",
+                    "El CI/NIT debe contener solo dígitos");
+
                 return Page();
             }
 
@@ -107,7 +128,7 @@ namespace TallerMecanicoScrum.Pages
             }
             catch
             {
-                // Token invÃ¡lido o manipulado.
+                // Token inválido o manipulado.
                 return RedirectToPage("/Clientes");
             }
 
@@ -115,13 +136,13 @@ namespace TallerMecanicoScrum.Pages
             {
                 _connection.Open();
 
-                string query = @"UPDATE cliente 
-                                 SET nombre = @nombre, 
-                                     apellido = @apellido, 
-                                     ci_nit = @ci_nit, 
-                                     telefono = @telefono, 
-                                     email = @email, 
-                                     direccion = @direccion 
+                string query = @"UPDATE cliente
+                                 SET nombre = @nombre,
+                                     apellido = @apellido,
+                                     ci_nit = @ci_nit,
+                                     telefono = @telefono,
+                                     email = @email,
+                                     direccion = @direccion
                                  WHERE id = @id";
 
                 using (MySqlCommand cmd = new MySqlCommand(query, _connection))

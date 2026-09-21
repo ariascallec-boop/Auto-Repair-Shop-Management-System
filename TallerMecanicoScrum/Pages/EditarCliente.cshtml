@@ -19,6 +19,10 @@
 
     </div>
 
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+
     <div class="card shadow-sm border-0">
 
         <div class="card-body">
@@ -42,6 +46,7 @@
 
                         <input asp-for="Cliente.Nombre"
                                class="form-control" />
+                        <span asp-validation-for="Cliente.Nombre" class="text-danger small"></span>
 
                         <span asp-validation-for="Cliente.Nombre"
                               class="text-danger">
@@ -57,6 +62,7 @@
 
                         <input asp-for="Cliente.Apellido"
                                class="form-control" />
+                        <span asp-validation-for="Cliente.Apellido" class="text-danger small"></span>
 
                         <span asp-validation-for="Cliente.Apellido"
                               class="text-danger">
@@ -72,6 +78,7 @@
 
                         <input asp-for="Cliente.CiNit"
                                class="form-control" />
+                        <span asp-validation-for="Cliente.CiNit" class="text-danger small"></span>
 
                         <span asp-validation-for="Cliente.CiNit"
                               class="text-danger">
@@ -87,6 +94,7 @@
 
                         <input asp-for="Cliente.Telefono"
                                class="form-control" />
+                        <span asp-validation-for="Cliente.Telefono" class="text-danger small"></span>
 
                         <span asp-validation-for="Cliente.Telefono"
                               class="text-danger">
@@ -103,6 +111,7 @@
                         <input asp-for="Cliente.Email"
                                type="email"
                                class="form-control" />
+                        <span asp-validation-for="Cliente.Email" class="text-danger small"></span>
 
                         <span asp-validation-for="Cliente.Email"
                               class="text-danger">
@@ -118,6 +127,7 @@
 
                         <input asp-for="Cliente.Direccion"
                                class="form-control" />
+                        <span asp-validation-for="Cliente.Direccion" class="text-danger small"></span>
 
                         <span asp-validation-for="Cliente.Direccion"
                               class="text-danger">

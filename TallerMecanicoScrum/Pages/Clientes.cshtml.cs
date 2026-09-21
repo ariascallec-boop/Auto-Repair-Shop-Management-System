@@ -67,8 +67,9 @@ namespace TallerMecanicoScrum.Pages
             {
                 _connection.Open();
 
-                string query = @"UPDATE cliente 
-                                 SET estado = 0 
+                // Borrado lógico del cliente.
+                string query = @"UPDATE cliente
+                                 SET estado = 0
                                  WHERE id = @id";
 
                 using (MySqlCommand cmd = new MySqlCommand(query, _connection))
@@ -93,8 +94,8 @@ namespace TallerMecanicoScrum.Pages
             {
                 _connection.Open();
 
-                string query = @"SELECT id, ci_nit, nombre, apellido, telefono, email, direccion, estado 
-                                 FROM cliente 
+                string query = @"SELECT id, ci_nit, nombre, apellido, telefono, email, direccion, estado
+                                 FROM cliente
                                  WHERE estado = 1";
 
                 using (MySqlCommand cmd = new MySqlCommand(query, _connection))
@@ -132,13 +133,14 @@ namespace TallerMecanicoScrum.Pages
             {
                 _connection.Open();
 
-                string query = @"SELECT id, ci_nit, nombre, apellido, telefono, email, direccion, estado 
-                                 FROM cliente 
-                                 WHERE estado = 1 AND (
-                                     nombre LIKE @buscar OR 
-                                     apellido LIKE @buscar OR 
-                                     ci_nit LIKE @buscar OR 
-                                     email LIKE @buscar
+                string query = @"SELECT id, ci_nit, nombre, apellido, telefono, email, direccion, estado
+                                 FROM cliente
+                                 WHERE estado = 1
+                                 AND (
+                                     nombre LIKE @buscar
+                                     OR apellido LIKE @buscar
+                                     OR ci_nit LIKE @buscar
+                                     OR email LIKE @buscar
                                  )";
 
                 using (MySqlCommand cmd = new MySqlCommand(query, _connection))
