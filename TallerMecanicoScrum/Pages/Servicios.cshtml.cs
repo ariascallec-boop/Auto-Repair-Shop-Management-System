@@ -1,23 +1,30 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using MySql.Data.MySqlClient;
 using TallerMecanicoScrum.Clases;
-
 namespace TallerMecanicoScrum.Pages
 {
     public class ServiciosModel : PageModel
     {
-        public List<Servicio> ListaServicios { get; set; }
-            = new List<Servicio>();
+        private readonly MySqlConnection _connection;
+
+        public ServiciosModel(MySqlConnection connection)
+        {
+            _connection = connection;
+        }
+        public List<Servicio> ListaServicios { get; set; } = new List<Servicio>();
 
         public string Buscar { get; set; } = "";
 
         public void OnGet(string buscar)
         {
-            CargarServicios();
-
             Buscar = buscar ?? "";
 
-            if (!string.IsNullOrWhiteSpace(Buscar))
+            if (string.IsNullOrWhiteSpace(Buscar))
+            {
+                CargarServicios();
+            }
+            else
             {
                 BuscarServicios();
             }
@@ -25,77 +32,134 @@ namespace TallerMecanicoScrum.Pages
 
         private void CargarServicios()
         {
-            // TEMPORAL:
-            // Estos datos se usan mientras no se conecte la base de datos.
 
-            ListaServicios.Add(new Servicio
+            try
             {
-                Id = 1,
-                Nombre = "Cambio de aceite",
-                Tipo = "preventivo",
-                Descripcion = "Cambio de aceite y revisión general",
-                Precio = 180,
-                DuracionEstimada = 45,
-                UnidadDuracion = "Minutos",
-                Estado = true
-            });
+                string query = @"SELECT id,nombre, tipo, descripcion, precio, duracion_estimada, unidad_duracion, 
+                                estado FROM servicio WHERE estado = TRUE ORDER BY nombre; ";
+                _connection.Open();
+                using MySqlCommand command = new MySqlCommand(query, _connection);
+                using MySqlDataReader reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    Servicio servicio = new Servicio
+                    {
+                        Id = Convert.ToInt32(reader["id"]),
+                        Nombre = reader["nombre"].ToString() ?? "",
+                        Tipo = reader["tipo"].ToString() ?? "",
+                        Descripcion = reader["descripcion"].ToString() ?? "",
+                        Precio = Convert.ToDecimal(reader["precio"]),
+                        DuracionEstimada = Convert.ToInt32(reader["duracion_estimada"]),
+                        UnidadDuracion = reader["unidad_duracion"].ToString() ?? "",
+                        Estado = Convert.ToBoolean(reader["estado"])
+                    };
+                    ListaServicios.Add(servicio);
 
-            ListaServicios.Add(new Servicio
-            {
-                Id = 2,
-                Nombre = "Revisión de frenos",
-                Tipo = "revision_simple",
-                Descripcion = "Inspección del sistema de frenos",
-                Precio = 120,
-                DuracionEstimada = 2,
-                UnidadDuracion = "Horas",
-                Estado = true
-            });
+                }
 
-            ListaServicios.Add(new Servicio
+            }
+            catch (Exception ex)
             {
-                Id = 3,
-                Nombre = "Reparación de motor",
-                Tipo = "correctivo",
-                Descripcion = "Diagnóstico y reparación del motor",
-                Precio = 800,
-                DuracionEstimada = 2,
-                UnidadDuracion = "Dias",
-                Estado = true
-            });
+                Console.WriteLine("Error al cargar servicios: " + ex.Message);
+            }
+            finally
+            {
+                if (_connection.State == System.Data.ConnectionState.Open)
+                {
+                    _connection.Close();
+                }
+            }
+
         }
 
         private void BuscarServicios()
         {
-            List<Servicio> resultado = new List<Servicio>();
 
-            for (int i = 0; i < ListaServicios.Count; i++)
+            try
             {
-                if (
-                    ListaServicios[i].Nombre.Contains(
-                        Buscar,
-                        StringComparison.OrdinalIgnoreCase
-                    ) ||
+                string query = @"SELECT id, nombre, tipo, descripcion, precio, duracion_estimada,unidad_duracion, estado 
+                                FROM servicio WHERE estado = TRUE  ";
 
-                    ListaServicios[i].Tipo.Contains(
-                        Buscar,
-                        StringComparison.OrdinalIgnoreCase
-                    )
-                )
+                if (!string.IsNullOrWhiteSpace(Buscar))
                 {
-                    resultado.Add(ListaServicios[i]);
+                    query += @"
+                AND ( nombre LIKE @buscar OR tipo LIKE @buscar)  ";
+                }
+                query += " ORDER BY nombre;";
+
+                _connection.Open();
+                using MySqlCommand command = new MySqlCommand(query, _connection);
+                {
+                    if (!string.IsNullOrWhiteSpace(Buscar))
+                    {
+                        command.Parameters.AddWithValue("@buscar", "%" + Buscar + "%" );
+                       
+                    }
+                    using MySqlDataReader reader = command.ExecuteReader();
+                    {
+                        while (reader.Read())
+                        {
+                            Servicio servicio = new Servicio
+                            {
+                                Id = Convert.ToInt32(reader["id"]),
+                                Nombre = reader["nombre"].ToString() ?? "",
+                                Tipo = reader["tipo"].ToString() ?? "",
+                                Descripcion = reader["descripcion"].ToString() ?? "",
+                                Precio = Convert.ToDecimal(reader["precio"]),
+                                DuracionEstimada =
+                                    Convert.ToInt32(reader["duracion_estimada"]),
+                                UnidadDuracion =
+                                    reader["unidad_duracion"].ToString() ?? "",
+                                Estado = Convert.ToBoolean(reader["estado"])
+                            };
+
+                            ListaServicios.Add(servicio);
+                        }
+
+                    }
+
                 }
             }
+            catch
+            {
 
-            ListaServicios = resultado;
+                throw;
+            }
+            finally
+            {
+                if (_connection.State == System.Data.ConnectionState.Open)
+                {
+                    _connection.Close();
+                }
+            }
         }
 
         public IActionResult OnPostEliminar(int id)
         {
-            // BACKEND:
-            // Luego se buscará el servicio por Id
-            // y se cambiará Estado = false
-            // para realizar borrado lógico.
+            try
+            {
+                string query = @" UPDATE servicio SET estado = FALSE WHERE id = @id; ";
+
+                _connection.Open();
+
+                using MySqlCommand command = new MySqlCommand(query, _connection);
+
+                command.Parameters.AddWithValue("@id", id);
+
+                command.ExecuteNonQuery();
+            }
+            catch 
+            {
+                throw;
+            }
+            finally
+            {
+                if (_connection.State ==
+                    System.Data.ConnectionState.Open)
+                {
+                    _connection.Close();
+                }
+            }
 
             return RedirectToPage("/Servicios");
         }
