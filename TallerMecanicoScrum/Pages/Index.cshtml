@@ -7,8 +7,6 @@
 
 <div class="container-fluid">
 
-    <!-- TITULO -->
-
     <div class="mb-4">
 
         <h2 class="fw-bold">
@@ -21,12 +19,7 @@
 
     </div>
 
-
-    <!-- TARJETAS -->
-
     <div class="row g-3 mb-4">
-
-        <!-- VEHICULOS EN TALLER -->
 
         <div class="col-md-3">
 
@@ -47,7 +40,7 @@
                         </small>
 
                         <h2 class="fw-bold mb-0">
-                            @Model.Vehiculos.Count
+                            @Model.TotalVehiculos
                         </h2>
 
                     </div>
@@ -57,9 +50,6 @@
             </div>
 
         </div>
-
-
-        <!-- EN REPARACION -->
 
         <div class="col-md-3">
 
@@ -80,9 +70,7 @@
                         </small>
 
                         <h2 class="fw-bold mb-0">
-
-                            @Model.Vehiculos.Count(v => v.Estado == "En reparación")
-
+                            @Model.TotalEnReparacion
                         </h2>
 
                     </div>
@@ -92,9 +80,6 @@
             </div>
 
         </div>
-
-
-        <!-- LISTOS -->
 
         <div class="col-md-3">
 
@@ -115,9 +100,7 @@
                         </small>
 
                         <h2 class="fw-bold mb-0">
-
-                            @Model.Vehiculos.Count(v => v.Estado == "Listo")
-
+                            @Model.TotalListosEntrega
                         </h2>
 
                     </div>
@@ -127,9 +110,6 @@
             </div>
 
         </div>
-
-
-        <!-- ENTREGAS -->
 
         <div class="col-md-3">
 
@@ -150,9 +130,7 @@
                         </small>
 
                         <h2 class="fw-bold mb-0">
-
-                            @Model.Vehiculos.Count
-
+                            @Model.TotalEntregasHoy
                         </h2>
 
                     </div>
@@ -164,9 +142,6 @@
         </div>
 
     </div>
-
-
-    <!-- TABLA -->
 
     <div class="card shadow-sm border-0">
 
@@ -186,7 +161,6 @@
 
                 </div>
 
-
                 <span class="badge bg-primary">
 
                     @DateTime.Now.ToString("dd/MM/yyyy")
@@ -197,7 +171,6 @@
 
         </div>
 
-
         <div class="card-body">
 
             <div class="table-responsive">
@@ -207,18 +180,15 @@
                     <thead class="table-light">
 
                         <tr>
-
                             <th>Placa</th>
                             <th>Cliente</th>
                             <th>Vehículo</th>
                             <th>Estado</th>
                             <th>Responsable</th>
-                            <th>Entrega</th>
-
+                            <th>Entrega estimada</th>
                         </tr>
 
                     </thead>
-
 
                     <tbody>
 
@@ -232,13 +202,11 @@
 
                                 </td>
 
-
                                 <td>
 
                                     @Model.Vehiculos[i].Cliente
 
                                 </td>
-
 
                                 <td>
 
@@ -246,25 +214,36 @@
 
                                 </td>
 
-
                                 <td>
 
-                                    @if (Model.Vehiculos[i].Estado == "Listo")
+                                    @if (Model.Vehiculos[i].Estado == "listo_para_entrega")
                                     {
                                         <span class="badge bg-success">
-                                            @Model.Vehiculos[i].Estado
+                                            Listo para entrega
                                         </span>
                                     }
-                                    else if (Model.Vehiculos[i].Estado == "En reparación")
+                                    else if (Model.Vehiculos[i].Estado == "en_reparacion")
                                     {
                                         <span class="badge bg-warning text-dark">
-                                            @Model.Vehiculos[i].Estado
+                                            En reparación
                                         </span>
                                     }
-                                    else if (Model.Vehiculos[i].Estado == "En prueba")
+                                    else if (Model.Vehiculos[i].Estado == "en_prueba")
                                     {
                                         <span class="badge bg-info text-dark">
-                                            @Model.Vehiculos[i].Estado
+                                            En prueba
+                                        </span>
+                                    }
+                                    else if (Model.Vehiculos[i].Estado == "esperando_repuesto")
+                                    {
+                                        <span class="badge bg-danger">
+                                            Esperando repuesto
+                                        </span>
+                                    }
+                                    else if (Model.Vehiculos[i].Estado == "en_revision")
+                                    {
+                                        <span class="badge bg-secondary">
+                                            En revisión
                                         </span>
                                     }
                                     else
@@ -276,17 +255,15 @@
 
                                 </td>
 
-
                                 <td>
 
                                     @Model.Vehiculos[i].Responsable
 
                                 </td>
 
-
                                 <td>
 
-                                    @Model.Vehiculos[i].HoraEntrega
+                                    @Model.Vehiculos[i].FechaEntregaEstimada.ToString("dd/MM/yyyy")
 
                                 </td>
 

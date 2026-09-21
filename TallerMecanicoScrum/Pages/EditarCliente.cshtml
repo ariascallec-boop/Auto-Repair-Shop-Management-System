@@ -1,0 +1,125 @@
+﻿@page
+@model TallerMecanicoScrum.Pages.EditarClienteModel
+
+@{
+    ViewData["Title"] = "Editar Cliente";
+}
+
+<div class="container-fluid">
+
+    <div class="mb-4">
+        <h2 class="fw-bold mb-1">
+            Editar Cliente
+        </h2>
+
+        <p class="text-muted mb-0">
+            Modificar la información del cliente
+        </p>
+    </div>
+
+    <div class="card shadow-sm border-0">
+
+        <div class="card-body">
+
+            <form method="post">
+
+                <input type="hidden"
+                       asp-for="Cliente.Id" />
+
+                <div class="row g-3">
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            Nombre
+                        </label>
+
+                        <input asp-for="Cliente.Nombre"
+                               class="form-control" />
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            Apellido
+                        </label>
+
+                        <input asp-for="Cliente.Apellido"
+                               class="form-control" />
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            CI/NIT
+                        </label>
+
+                        <input asp-for="Cliente.CiNit"
+                               class="form-control" />
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            Teléfono
+                        </label>
+
+                        <input asp-for="Cliente.Telefono"
+                               class="form-control" />
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            Email
+                        </label>
+
+                        <input asp-for="Cliente.Email"
+                               type="email"
+                               class="form-control" />
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            Dirección
+                        </label>
+
+                        <input asp-for="Cliente.Direccion"
+                               class="form-control" />
+
+                    </div>
+
+                </div>
+
+                <hr class="my-4" />
+
+                <div class="d-flex justify-content-end gap-2">
+
+                    <a asp-page="/Clientes"
+                       class="btn btn-secondary">
+                        Cancelar
+                    </a>
+
+                    <button type="submit"
+                            class="btn btn-primary">
+
+                        <i class="bi bi-save me-1"></i>
+                        Guardar Cambios
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>

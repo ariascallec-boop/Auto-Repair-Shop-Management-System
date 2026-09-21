@@ -4,10 +4,10 @@ using TallerMecanicoScrum.Clases;
 
 namespace TallerMecanicoScrum.Pages
 {
-    public class NuevoVehiculoModel : PageModel
+    public class NuevoClienteModel : PageModel
     {
         [BindProperty]
-        public Vehiculo Vehiculo { get; set; } = new Vehiculo();
+        public Cliente Cliente { get; set; } = new Cliente();
 
         public void OnGet()
         {
@@ -15,12 +15,12 @@ namespace TallerMecanicoScrum.Pages
 
         public IActionResult OnPost()
         {
-            Vehiculo.Estado = true;
+            Cliente.Estado = true;
 
             // Backend:
-            // aquí se guardará el vehículo en la base de datos.
+            // aquí se guardará el cliente en la base de datos.
 
-            return RedirectToPage("/Vehiculos");
+            return RedirectToPage("/Clientes");
         }
     }
 }

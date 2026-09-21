@@ -14,6 +14,8 @@
 
         public int DuracionEstimada { get; set; }
 
+        public string UnidadDuracion { get; set; } = "";
+
         public bool Estado { get; set; } = true;
     }
 }

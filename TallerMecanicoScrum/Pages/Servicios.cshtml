@@ -1,8 +1,8 @@
 ﻿@page
-@model TallerMecanicoScrum.Pages.VehiculosModel
+@model TallerMecanicoScrum.Pages.ServiciosModel
 
 @{
-    ViewData["Title"] = "Vehículos";
+    ViewData["Title"] = "Servicios";
 }
 
 <div class="container-fluid">
@@ -10,18 +10,20 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
 
         <div>
-            <h2 class="fw-bold mb-1">Vehículos</h2>
+            <h2 class="fw-bold mb-1">
+                Servicios
+            </h2>
 
             <p class="text-muted mb-0">
-                Registro de vehículos del taller
+                Servicios disponibles en el taller
             </p>
         </div>
 
-        <a asp-page="/NuevoVehiculo"
+        <a asp-page="/NuevoServicio"
            class="btn btn-primary">
 
             <i class="bi bi-plus-circle me-1"></i>
-            Nuevo Vehículo
+            Nuevo Servicio
 
         </a>
 
@@ -46,7 +48,7 @@
                                name="buscar"
                                value="@Model.Buscar"
                                class="form-control"
-                               placeholder="Buscar por placa, marca o modelo..." />
+                               placeholder="Buscar por nombre o tipo..." />
 
                         <button type="submit"
                                 class="btn btn-primary">
@@ -69,14 +71,11 @@
 
                         <tr>
                             <th>N°</th>
-                            <th>Placa</th>
-                            <th>Marca</th>
-                            <th>Modelo</th>
-                            <th>Año</th>
-                            <th>Color</th>
+                            <th>Nombre</th>
                             <th>Tipo</th>
-                            <th>Kilometraje</th>
-                            <th>Cliente</th>
+                            <th>Descripción</th>
+                            <th>Precio</th>
+                            <th>Duración</th>
                             <th>Estado</th>
                             <th>Acciones</th>
                         </tr>
@@ -85,7 +84,7 @@
 
                     <tbody>
 
-                        @for (int i = 0; i < Model.ListaVehiculos.Count; i++)
+                        @for (int i = 0; i < Model.ListaServicios.Count; i++)
                         {
                             <tr>
 
@@ -94,40 +93,48 @@
                                 </td>
 
                                 <td class="fw-semibold">
-                                    @Model.ListaVehiculos[i].Placa
-                                </td>
-
-                                <td>
-                                    @Model.ListaVehiculos[i].Marca
-                                </td>
-
-                                <td>
-                                    @Model.ListaVehiculos[i].Modelo
-                                </td>
-
-                                <td>
-                                    @Model.ListaVehiculos[i].Anio
-                                </td>
-
-                                <td>
-                                    @Model.ListaVehiculos[i].Color
-                                </td>
-
-                                <td>
-                                    @Model.ListaVehiculos[i].Tipo
-                                </td>
-
-                                <td>
-                                    @Model.ListaVehiculos[i].Kilometraje km
-                                </td>
-
-                                <td>
-                                    Cliente @Model.ListaVehiculos[i].ClienteId
+                                    @Model.ListaServicios[i].Nombre
                                 </td>
 
                                 <td>
 
-                                    @if (Model.ListaVehiculos[i].Estado)
+                                    @if (Model.ListaServicios[i].Tipo == "preventivo")
+                                    {
+                                        <span class="badge bg-primary">
+                                            Preventivo
+                                        </span>
+                                    }
+                                    else if (Model.ListaServicios[i].Tipo == "correctivo")
+                                    {
+                                        <span class="badge bg-warning text-dark">
+                                            Correctivo
+                                        </span>
+                                    }
+                                    else if (Model.ListaServicios[i].Tipo == "revision_simple")
+                                    {
+                                        <span class="badge bg-info text-dark">
+                                            Revisión simple
+                                        </span>
+                                    }
+
+                                </td>
+
+                                <td>
+                                    @Model.ListaServicios[i].Descripcion
+                                </td>
+
+                                <td>
+                                    Bs @Model.ListaServicios[i].Precio
+                                </td>
+
+                                <td>
+                                    @Model.ListaServicios[i].DuracionEstimada
+                                    @Model.ListaServicios[i].UnidadDuracion
+                                </td>
+
+                                <td>
+
+                                    @if (Model.ListaServicios[i].Estado)
                                     {
                                         <span class="badge bg-success">
                                             Activo
@@ -144,8 +151,8 @@
 
                                 <td>
 
-                                    <a asp-page="/EditarVehiculo"
-                                       asp-route-id="@Model.ListaVehiculos[i].Id"
+                                    <a asp-page="/EditarServicio"
+                                       asp-route-id="@Model.ListaServicios[i].Id"
                                        class="btn btn-sm btn-warning">
 
                                         <i class="bi bi-pencil"></i>
@@ -156,7 +163,7 @@
                                     <button type="button"
                                             class="btn btn-sm btn-danger"
                                             data-bs-toggle="modal"
-                                            data-bs-target="#modalEliminar-@Model.ListaVehiculos[i].Id">
+                                            data-bs-target="#modalEliminarServicio-@Model.ListaServicios[i].Id">
 
                                         <i class="bi bi-trash"></i>
                                         Eliminar
@@ -164,7 +171,7 @@
                                     </button>
 
                                     <div class="modal fade"
-                                         id="modalEliminar-@Model.ListaVehiculos[i].Id"
+                                         id="modalEliminarServicio-@Model.ListaServicios[i].Id"
                                          tabindex="-1"
                                          aria-hidden="true">
 
@@ -187,13 +194,10 @@
 
                                                 <div class="modal-body">
 
-                                                    ¿Está seguro que desea eliminar el vehículo:
+                                                    ¿Está seguro que desea eliminar el servicio:
 
                                                     <strong>
-                                                        @Model.ListaVehiculos[i].Marca
-                                                        @Model.ListaVehiculos[i].Modelo
-                                                        -
-                                                        @Model.ListaVehiculos[i].Placa
+                                                        @Model.ListaServicios[i].Nombre
                                                     </strong>?
 
                                                 </div>
@@ -213,7 +217,7 @@
 
                                                         <input type="hidden"
                                                                name="id"
-                                                               value="@Model.ListaVehiculos[i].Id" />
+                                                               value="@Model.ListaServicios[i].Id" />
 
                                                         <button type="submit"
                                                                 class="btn btn-danger">

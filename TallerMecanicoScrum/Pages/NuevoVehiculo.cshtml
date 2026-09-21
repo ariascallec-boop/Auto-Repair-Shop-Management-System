@@ -1,13 +1,17 @@
 ﻿@page
 @model TallerMecanicoScrum.Pages.NuevoVehiculoModel
-@{
 
+@{
+    ViewData["Title"] = "Nuevo Vehículo";
 }
 
 <div class="container-fluid">
 
     <div class="mb-4">
-        <h2 class="fw-bold mb-1">Nuevo Vehículo</h2>
+        <h2 class="fw-bold mb-1">
+            Nuevo Vehículo
+        </h2>
+
         <p class="text-muted mb-0">
             Registrar un nuevo vehículo en el sistema
         </p>
@@ -29,7 +33,7 @@
 
                         <input asp-for="Vehiculo.Placa"
                                class="form-control"
-                               placeholder="Ej. ABC-123" />
+                               placeholder="Ej. 1234ABC" />
 
                     </div>
 
@@ -64,6 +68,7 @@
                         </label>
 
                         <input asp-for="Vehiculo.Anio"
+                               type="number"
                                class="form-control"
                                placeholder="Ej. 2020" />
 
@@ -78,6 +83,56 @@
                         <input asp-for="Vehiculo.Color"
                                class="form-control"
                                placeholder="Ej. Blanco" />
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            Tipo
+                        </label>
+
+                        <select asp-for="Vehiculo.Tipo"
+                                class="form-select">
+
+                            <option value="">
+                                Seleccione un tipo
+                            </option>
+
+                            <option value="Sedán">
+                                Sedán
+                            </option>
+
+                            <option value="SUV">
+                                SUV
+                            </option>
+
+                            <option value="Camioneta">
+                                Camioneta
+                            </option>
+
+                            <option value="Hatchback">
+                                Hatchback
+                            </option>
+
+                            <option value="Van">
+                                Van
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            Kilometraje
+                        </label>
+
+                        <input asp-for="Vehiculo.Kilometraje"
+                               type="number"
+                               class="form-control"
+                               placeholder="Ej. 85000" />
 
                     </div>
 

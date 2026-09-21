@@ -22,6 +22,8 @@ namespace TallerMecanicoScrum.Pages
                 Modelo = "Corolla",
                 Anio = 2020,
                 Color = "Blanco",
+                Tipo = "Sedán",
+                Kilometraje = 85000,
                 ClienteId = 1,
                 Estado = true
             };
@@ -29,7 +31,8 @@ namespace TallerMecanicoScrum.Pages
 
         public IActionResult OnPost()
         {
-            // Después aquí actualizaremos en la base de datos.
+            // Backend:
+            // aquí se actualizará el vehículo en la base de datos.
 
             return RedirectToPage("/Vehiculos");
         }
