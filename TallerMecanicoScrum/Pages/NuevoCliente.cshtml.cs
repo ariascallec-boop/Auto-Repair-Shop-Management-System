@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using MySql.Data.MySqlClient;
 using TallerMecanicoScrum.Clases;
+using System.Text.RegularExpressions;
 
 namespace TallerMecanicoScrum.Pages
 {
@@ -23,8 +24,23 @@ namespace TallerMecanicoScrum.Pages
 
         public IActionResult OnPost()
         {
+            // Trim inputs (defensive)
+            Cliente.Nombre = Cliente.Nombre?.Trim();
+            Cliente.Apellido = Cliente.Apellido?.Trim();
+            Cliente.CiNit = Cliente.CiNit?.Trim();
+            Cliente.Telefono = Cliente.Telefono?.Trim();
+            Cliente.Email = Cliente.Email?.Trim();
+            Cliente.Direccion = Cliente.Direccion?.Trim();
+
+            // Server-side additional validations
             if (!ModelState.IsValid)
             {
+                return Page();
+            }
+
+            if (!string.IsNullOrWhiteSpace(Cliente.CiNit) && !Regex.IsMatch(Cliente.CiNit, "^[0-9]+$"))
+            {
+                ModelState.AddModelError("Cliente.CiNit", "El CI/NIT debe contener solo dígitos");
                 return Page();
             }
 
