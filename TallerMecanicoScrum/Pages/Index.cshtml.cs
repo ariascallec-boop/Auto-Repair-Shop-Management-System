@@ -2,11 +2,17 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using MySql.Data.MySqlClient;
 namespace TallerMecanicoScrum.Pages
 {
-    
     public class IndexModel : PageModel
     {
-        public List<VehiculoResumen> Vehiculos { get; set; }
-            = new List<VehiculoResumen>();
+        private readonly MySqlConnection _connection;
+
+        // Inyección de dependencias configurada desde Program.cs
+        public IndexModel(MySqlConnection connection)
+        {
+            _connection = connection;
+        }
+
+        public List<VehiculoResumen> Vehiculos { get; set; } = new List<VehiculoResumen>();
 
         public int TotalVehiculos { get; set; }
 
@@ -19,51 +25,45 @@ namespace TallerMecanicoScrum.Pages
         public void OnGet()
         {
             CargarVehiculos();
-
             CalcularResumen();
         }
 
         private void CargarVehiculos()
         {
-            Vehiculos.Add(new VehiculoResumen
-            {
-                Placa = "ABC-123",
-                Cliente = "Juan Perez",
-                Vehiculo = "Toyota Corolla",
-                Estado = "listo_para_entrega",
-                Responsable = "Carlos Rojas",
-                FechaEntregaEstimada = DateTime.Today
-            });
+            Vehiculos.Clear();
 
-            Vehiculos.Add(new VehiculoResumen
+            try
             {
-                Placa = "DEF-456",
-                Cliente = "Maria Gomez",
-                Vehiculo = "Hyundai Tucson",
-                Estado = "en_prueba",
-                Responsable = "Luis Martinez",
-                FechaEntregaEstimada = DateTime.Today
-            });
+                _connection.Open();
 
-            Vehiculos.Add(new VehiculoResumen
-            {
-                Placa = "GHI-789",
-                Cliente = "Pedro Sanchez",
-                Vehiculo = "Chevrolet Sail",
-                Estado = "en_reparacion",
-                Responsable = "Ana Torres",
-                FechaEntregaEstimada = DateTime.Today.AddDays(1)
-            });
+                string query = @"SELECT placa, cliente, vehiculo, estado, responsable, fecha_entrega_estimada 
+                                 FROM vw_resumen_inicio";
 
-            Vehiculos.Add(new VehiculoResumen
+                using (MySqlCommand cmd = new MySqlCommand(query, _connection))
+                {
+                    using (MySqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            Vehiculos.Add(new VehiculoResumen
+                            {
+                                Placa = reader["placa"]?.ToString() ?? "",
+                                Cliente = reader["cliente"]?.ToString() ?? "",
+                                Vehiculo = reader["vehiculo"]?.ToString() ?? "",
+                                Estado = reader["estado"]?.ToString() ?? "",
+                                Responsable = reader["responsable"]?.ToString() ?? "",
+                                FechaEntregaEstimada = reader["fecha_entrega_estimada"] != DBNull.Value
+                                                       ? Convert.ToDateTime(reader["fecha_entrega_estimada"])
+                                                       : DateTime.MinValue
+                            });
+                        }
+                    }
+                }
+            }
+            finally
             {
-                Placa = "JKL-012",
-                Cliente = "Laura Castro",
-                Vehiculo = "Kia Sportage",
-                Estado = "en_revision",
-                Responsable = "Diego Ramirez",
-                FechaEntregaEstimada = DateTime.Today.AddDays(2)
-            });
+                _connection.Close();
+            }
         }
 
         private void CalcularResumen()
