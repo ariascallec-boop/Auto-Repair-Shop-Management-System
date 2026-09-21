@@ -39,7 +39,7 @@ namespace TallerMecanicoScrum.Pages
             {
                 _connection.Open();
 
-                // Borrado lógico usando 'id' en lugar de 'id_cliente'
+                // Borrado lÃ³gico usando 'id' en lugar de 'id_cliente'
                 string query = "UPDATE cliente SET estado = 0 WHERE id = @id";
 
                 using (MySqlCommand cmd = new MySqlCommand(query, _connection))
