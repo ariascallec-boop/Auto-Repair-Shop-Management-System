@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using MySql.Data.MySqlClient;
-
 namespace TallerMecanicoScrum.Pages
 {
     public class IndexModel : PageModel
