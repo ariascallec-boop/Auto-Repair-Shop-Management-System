@@ -1,114 +1,117 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using MySql.Data.MySqlClient;
 using TallerMecanicoScrum.Clases;
 
 namespace TallerMecanicoScrum.Pages
 {
     public class VehiculosModel : PageModel
     {
+        private readonly MySqlConnection _connection;
+
+        public VehiculosModel(MySqlConnection connection)
+        {
+            _connection = connection;
+        }
+
         public List<Vehiculo> ListaVehiculos { get; set; } = new List<Vehiculo>();
 
         public string Buscar { get; set; } = "";
 
         public void OnGet(string buscar)
         {
-            CargarVehiculos();
-
             Buscar = buscar ?? "";
 
-            if (!string.IsNullOrWhiteSpace(Buscar))
-            {
-                BuscarVehiculos();
-            }
+            CargarVehiculos();
         }
 
         public IActionResult OnPostEliminar(int id)
         {
-            // Backend:
-            // aquí se realizará el borrado lógico
-            // cambiando Estado = false.
+            try
+            {
+                _connection.Open();
+
+                string query = @"UPDATE vehiculo
+                                 SET estado = false
+                                 WHERE id = @id";
+
+                using (MySqlCommand cmd = new MySqlCommand(query, _connection))
+                {
+                    cmd.Parameters.AddWithValue("@id", id);
+
+                    cmd.ExecuteNonQuery();
+                }
+            }
+            finally
+            {
+                _connection.Close();
+            }
 
             return RedirectToPage("/Vehiculos");
         }
 
         private void CargarVehiculos()
         {
-            ListaVehiculos.Add(new Vehiculo
+            try
             {
-                Id = 1,
-                Placa = "ABC-123",
-                Marca = "Toyota",
-                Modelo = "Corolla",
-                Anio = 2020,
-                Color = "Blanco",
-                Tipo = "Sedán",
-                Kilometraje = 85000,
-                ClienteId = 1,
-                Estado = true
-            });
+                _connection.Open();
 
-            ListaVehiculos.Add(new Vehiculo
-            {
-                Id = 2,
-                Placa = "DEF-456",
-                Marca = "Hyundai",
-                Modelo = "Tucson",
-                Anio = 2021,
-                Color = "Negro",
-                Tipo = "SUV",
-                Kilometraje = 62000,
-                ClienteId = 2,
-                Estado = true
-            });
+                string query = @"SELECT
+                                    id,
+                                    marca,
+                                    modelo,
+                                    anio,
+                                    color,
+                                    placa,
+                                    estado,
+                                    tipo,
+                                    kilometraje,
+                                    cliente_id
+                                 FROM vehiculo";
 
-            ListaVehiculos.Add(new Vehiculo
-            {
-                Id = 3,
-                Placa = "GHI-789",
-                Marca = "Chevrolet",
-                Modelo = "Sail",
-                Anio = 2019,
-                Color = "Rojo",
-                Tipo = "Sedán",
-                Kilometraje = 105000,
-                ClienteId = 3,
-                Estado = true
-            });
-        }
-
-        private void BuscarVehiculos()
-        {
-            List<Vehiculo> resultado = new List<Vehiculo>();
-
-            for (int i = 0; i < ListaVehiculos.Count; i++)
-            {
-                if (
-                    ListaVehiculos[i].Placa.Contains(
-                        Buscar,
-                        StringComparison.OrdinalIgnoreCase
-                    ) ||
-
-                    ListaVehiculos[i].Marca.Contains(
-                        Buscar,
-                        StringComparison.OrdinalIgnoreCase
-                    ) ||
-
-                    ListaVehiculos[i].Modelo.Contains(
-                        Buscar,
-                        StringComparison.OrdinalIgnoreCase
-                    ) ||
-
-                    ListaVehiculos[i].Tipo.Contains(
-                        Buscar,
-                        StringComparison.OrdinalIgnoreCase
-                    )
-                )
+                if (!string.IsNullOrWhiteSpace(Buscar))
                 {
-                    resultado.Add(ListaVehiculos[i]);
+                    query += @" WHERE placa LIKE @buscar
+                                OR marca LIKE @buscar
+                                OR modelo LIKE @buscar
+                                OR tipo LIKE @buscar";
+                }
+
+                query += " ORDER BY id DESC";
+
+                using (MySqlCommand cmd = new MySqlCommand(query, _connection))
+                {
+                    if (!string.IsNullOrWhiteSpace(Buscar))
+                    {
+                        cmd.Parameters.AddWithValue("@buscar", "%" + Buscar + "%");
+                    }
+
+                    using (MySqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            Vehiculo vehiculo = new Vehiculo();
+
+                            vehiculo.Id = Convert.ToInt32(reader["id"]);
+                            vehiculo.Marca = reader["marca"].ToString();
+                            vehiculo.Modelo = reader["modelo"].ToString();
+                            vehiculo.Anio = Convert.ToInt32(reader["anio"]);
+                            vehiculo.Color = reader["color"].ToString();
+                            vehiculo.Placa = reader["placa"].ToString();
+                            vehiculo.Estado = Convert.ToBoolean(reader["estado"]);
+                            vehiculo.Tipo = reader["tipo"].ToString();
+                            vehiculo.Kilometraje = Convert.ToInt32(reader["kilometraje"]);
+                            vehiculo.ClienteId = Convert.ToInt32(reader["cliente_id"]);
+
+                            ListaVehiculos.Add(vehiculo);
+                        }
+                    }
                 }
             }
-
-            ListaVehiculos = resultado;
+            finally
+            {
+                _connection.Close();
+            }
         }
     }
 }
