@@ -62,6 +62,16 @@ namespace TallerMecanicoScrum.Pages
 
         public IActionResult OnPost()
         {
+            Servicio.Nombre = Validaciones.Capitalizar(Servicio.Nombre);
+
+            if (!Validaciones.LetrasNumerosEspacios(Servicio.Nombre))
+            {
+                ModelState.AddModelError(
+                    "Servicio.Nombre",
+                    "El nombre solo puede contener letras, números y espacios"
+                );
+            }
+
             if (!ModelState.IsValid)
             {
                 return Page();
@@ -90,7 +100,11 @@ namespace TallerMecanicoScrum.Pages
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error al actualizar servicio: " + ex.Message);
+                ModelState.AddModelError(
+                    "",
+                    "Error al actualizar el servicio: " + ex.Message
+                );
+
                 return Page();
             }
             finally
