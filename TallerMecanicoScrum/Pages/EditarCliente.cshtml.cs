@@ -45,7 +45,7 @@ namespace TallerMecanicoScrum.Pages
                                 Telefono = reader["telefono"]?.ToString() ?? "",
                                 Email = reader["email"]?.ToString() ?? "",
                                 Direccion = reader["direccion"]?.ToString() ?? "",
-                                Estado = Convert.ToBoolean(reader["estado"])
+                                Estado = Convert.ToBoolean(reader["estado"]) 
                             };
                         }
                         else
@@ -65,25 +65,42 @@ namespace TallerMecanicoScrum.Pages
 
         public IActionResult OnPost()
         {
-            // Trim inputs (defensive)
-            Cliente.Nombre = Cliente.Nombre?.Trim();
-            Cliente.Apellido = Cliente.Apellido?.Trim();
-            Cliente.CiNit = Cliente.CiNit?.Trim();
-            Cliente.Telefono = Cliente.Telefono?.Trim();
-            Cliente.Email = Cliente.Email?.Trim();
-            Cliente.Direccion = Cliente.Direccion?.Trim();
+            // Trim and collapse spaces
+            string NormalizeSpaces(string s) => s == null ? null : Regex.Replace(s.Trim(), "\\s+", " ");
+
+            Cliente.Nombre = NormalizeSpaces(Cliente.Nombre);
+            Cliente.Apellido = NormalizeSpaces(Cliente.Apellido);
+            Cliente.CiNit = NormalizeSpaces(Cliente.CiNit);
+            Cliente.Telefono = NormalizeSpaces(Cliente.Telefono);
+            Cliente.Email = NormalizeSpaces(Cliente.Email);
+            Cliente.Direccion = NormalizeSpaces(Cliente.Direccion);
+
+            // Normalize name capitalization
+            string NormalizeName(string s)
+            {
+                if (string.IsNullOrWhiteSpace(s)) return s;
+                var parts = s.Split(' ');
+                for (int i = 0; i < parts.Length; i++)
+                {
+                    var p = parts[i].ToLower();
+                    parts[i] = char.ToUpper(p[0]) + (p.Length > 1 ? p.Substring(1) : "");
+                }
+                return string.Join(' ', parts);
+            }
+
+            Cliente.Nombre = NormalizeName(Cliente.Nombre);
+            Cliente.Apellido = NormalizeName(Cliente.Apellido);
+
+            // Re-validate model after normalization
+            ModelState.Clear();
+            TryValidateModel(Cliente, nameof(Cliente));
 
             if (!ModelState.IsValid)
             {
                 return Page();
             }
 
-            // Additional server-side validation
-            if (!string.IsNullOrWhiteSpace(Cliente.CiNit) && !Regex.IsMatch(Cliente.CiNit, "^[0-9]+$"))
-            {
-                ModelState.AddModelError("Cliente.CiNit", "El CI/NIT debe contener solo dígitos");
-                return Page();
-            }
+            // Model-level validations (IValidatableObject on Cliente) already ran via TryValidateModel
 
             try
             {
