@@ -39,6 +39,9 @@
                         <input asp-for="Vehiculo.Placa"
                                class="form-control" />
 
+                        <span asp-validation-for="Vehiculo.Placa"
+                              class="text-danger small"></span>
+
                     </div>
 
                     <div class="col-md-6">
@@ -50,6 +53,9 @@
                         <input asp-for="Vehiculo.Marca"
                                class="form-control" />
 
+                        <span asp-validation-for="Vehiculo.Marca"
+                              class="text-danger small"></span>
+
                     </div>
 
                     <div class="col-md-6">
@@ -60,6 +66,9 @@
 
                         <input asp-for="Vehiculo.Modelo"
                                class="form-control" />
+
+                        <span asp-validation-for="Vehiculo.Modelo"
+                              class="text-danger small"></span>
 
                     </div>
 
@@ -73,6 +82,9 @@
                                type="number"
                                class="form-control" />
 
+                        <span asp-validation-for="Vehiculo.Anio"
+                              class="text-danger small"></span>
+
                     </div>
 
                     <div class="col-md-6">
@@ -84,6 +96,9 @@
                         <input asp-for="Vehiculo.Color"
                                class="form-control" />
 
+                        <span asp-validation-for="Vehiculo.Color"
+                              class="text-danger small"></span>
+
                     </div>
 
                     <div class="col-md-6">
@@ -94,6 +109,10 @@
 
                         <select asp-for="Vehiculo.Tipo"
                                 class="form-select">
+
+                            <option value="">
+                                Seleccione un tipo
+                            </option>
 
                             <option value="Sedán">
                                 Sedán
@@ -117,6 +136,9 @@
 
                         </select>
 
+                        <span asp-validation-for="Vehiculo.Tipo"
+                              class="text-danger small"></span>
+
                     </div>
 
                     <div class="col-md-6">
@@ -129,6 +151,9 @@
                                type="number"
                                class="form-control" />
 
+                        <span asp-validation-for="Vehiculo.Kilometraje"
+                              class="text-danger small"></span>
+
                     </div>
 
                     <div class="col-md-6">
@@ -138,21 +163,17 @@
                         </label>
 
                         <select asp-for="Vehiculo.ClienteId"
+                                asp-items="Model.ListaClientes"
                                 class="form-select">
 
-                            <option value="1">
-                                Juan Pérez
-                            </option>
-
-                            <option value="2">
-                                María Gómez
-                            </option>
-
-                            <option value="3">
-                                Pedro Sánchez
+                            <option value="">
+                                Seleccione un cliente
                             </option>
 
                         </select>
+
+                        <span asp-validation-for="Vehiculo.ClienteId"
+                              class="text-danger small"></span>
 
                     </div>
 
@@ -187,3 +208,7 @@
     </div>
 
 </div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

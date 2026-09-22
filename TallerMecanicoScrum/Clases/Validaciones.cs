@@ -161,5 +161,50 @@
 
             return placa.Trim().ToUpper();
         }
+        // Permite letras, espacios y guiones.
+        // Se puede usar en marcas como "Mercedes-Benz".
+        // No permite números ni símbolos como @, #, $, etc.
+        public static bool LetrasEspaciosGuion(string texto)
+        {
+            if (string.IsNullOrWhiteSpace(texto))
+            {
+                return false;
+            }
+
+            foreach (char caracter in texto)
+            {
+                if (!char.IsLetter(caracter) &&
+                    !char.IsWhiteSpace(caracter) &&
+                    caracter != '-')
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        // Permite letras, números, espacios y guiones.
+        // Se puede usar en modelos como "CX-5", "F-150", "Serie 3".
+        // No permite símbolos como @, #, $, %, etc.
+        public static bool LetrasNumerosEspaciosGuion(string texto)
+        {
+            if (string.IsNullOrWhiteSpace(texto))
+            {
+                return false;
+            }
+
+            foreach (char caracter in texto)
+            {
+                if (!char.IsLetterOrDigit(caracter) &&
+                    !char.IsWhiteSpace(caracter) &&
+                    caracter != '-')
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
     }
 }
