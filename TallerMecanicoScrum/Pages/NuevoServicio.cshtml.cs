@@ -23,6 +23,16 @@ namespace TallerMecanicoScrum.Pages
 
         public IActionResult OnPost()
         {
+            Servicio.Nombre = Validaciones.Capitalizar(Servicio.Nombre);
+
+            if (!Validaciones.LetrasNumerosEspacios(Servicio.Nombre))
+            {
+                ModelState.AddModelError(
+                    "Servicio.Nombre",
+                    "El nombre solo puede contener letras, números y espacios"
+                );
+            }
+
             if (!ModelState.IsValid)
             {
                 return Page();
@@ -33,7 +43,7 @@ namespace TallerMecanicoScrum.Pages
                 Servicio.Estado = true;
 
                 string query = @"INSERT INTO servicio (nombre, tipo, descripcion, precio, duracion_estimada, unidad_duracion, estado)
-                                 VALUES (@nombre, @tipo, @descripcion, @precio, @duracionEstimada, @unidadDuracion, @estado);";
+                         VALUES (@nombre, @tipo, @descripcion, @precio, @duracionEstimada, @unidadDuracion, @estado);";
 
                 _connection.Open();
 

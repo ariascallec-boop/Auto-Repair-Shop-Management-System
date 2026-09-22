@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using MySql.Data.MySqlClient;
 using TallerMecanicoScrum.Clases;
 
@@ -17,17 +18,54 @@ namespace TallerMecanicoScrum.Pages
         [BindProperty]
         public Vehiculo Vehiculo { get; set; } = new Vehiculo();
 
-        public string Mensaje { get; set; } = "";
+        public List<SelectListItem> ListaClientes { get; set; } = new List<SelectListItem>();
 
         public void OnGet()
         {
+            CargarClientes();
         }
 
         public IActionResult OnPost()
         {
+            Vehiculo.Placa = Validaciones.FormatearPlaca(Vehiculo.Placa);
+            Vehiculo.Marca = Validaciones.Capitalizar(Vehiculo.Marca);
+            Vehiculo.Color = Validaciones.Capitalizar(Vehiculo.Color);
+
+            if (!Validaciones.ValidarPlaca(Vehiculo.Placa))
+            {
+                ModelState.AddModelError(
+                    "Vehiculo.Placa",
+                    "La placa debe tener 3 o 4 números seguidos de 3 letras"
+                );
+            }
+
+            if (!Validaciones.LetrasEspaciosGuion(Vehiculo.Marca))
+            {
+                ModelState.AddModelError(
+                    "Vehiculo.Marca",
+                    "La marca solo puede contener letras, espacios y guiones"
+                );
+            }
+
+            if (!Validaciones.LetrasNumerosEspaciosGuion(Vehiculo.Modelo))
+            {
+                ModelState.AddModelError(
+                    "Vehiculo.Modelo",
+                    "El modelo solo puede contener letras, números, espacios y guiones"
+                );
+            }
+
+            if (!Validaciones.SoloLetras(Vehiculo.Color))
+            {
+                ModelState.AddModelError(
+                    "Vehiculo.Color",
+                    "El color solo puede contener letras"
+                );
+            }
+
             if (!ModelState.IsValid)
             {
-                Mensaje = "Hay datos inválidos en el formulario.";
+                CargarClientes();
                 return Page();
             }
 
@@ -38,48 +76,80 @@ namespace TallerMecanicoScrum.Pages
                 _connection.Open();
 
                 string query = @"INSERT INTO vehiculo
-                                (marca, modelo, anio, color, placa, estado, tipo, kilometraje, cliente_id)
-                                VALUES
-                                (@marca, @modelo, @anio, @color, @placa, @estado, @tipo, @kilometraje, @clienteId)";
+                                 (placa, marca, modelo, anio, color, tipo, kilometraje, cliente_id, estado)
+                                 VALUES
+                                 (@placa, @marca, @modelo, @anio, @color, @tipo, @kilometraje, @cliente_id, @estado)";
 
-                using (MySqlCommand cmd = new MySqlCommand(query, _connection))
-                {
-                    cmd.Parameters.AddWithValue("@marca", Vehiculo.Marca ?? "");
-                    cmd.Parameters.AddWithValue("@modelo", Vehiculo.Modelo ?? "");
-                    cmd.Parameters.AddWithValue("@anio", Vehiculo.Anio);
-                    cmd.Parameters.AddWithValue("@color", Vehiculo.Color ?? "");
-                    cmd.Parameters.AddWithValue("@placa", Vehiculo.Placa ?? "");
-                    cmd.Parameters.AddWithValue("@estado", Vehiculo.Estado);
-                    cmd.Parameters.AddWithValue("@tipo", Vehiculo.Tipo ?? "");
-                    cmd.Parameters.AddWithValue("@kilometraje", Vehiculo.Kilometraje);
-                    cmd.Parameters.AddWithValue("@clienteId", Vehiculo.ClienteId);
+                using MySqlCommand cmd = new MySqlCommand(query, _connection);
 
-                    int filas = cmd.ExecuteNonQuery();
+                cmd.Parameters.AddWithValue("@placa", Vehiculo.Placa);
+                cmd.Parameters.AddWithValue("@marca", Vehiculo.Marca);
+                cmd.Parameters.AddWithValue("@modelo", Vehiculo.Modelo);
+                cmd.Parameters.AddWithValue("@anio", Vehiculo.Anio);
+                cmd.Parameters.AddWithValue("@color", Vehiculo.Color);
+                cmd.Parameters.AddWithValue("@tipo", Vehiculo.Tipo);
+                cmd.Parameters.AddWithValue("@kilometraje", Vehiculo.Kilometraje);
+                cmd.Parameters.AddWithValue("@cliente_id", Vehiculo.ClienteId);
+                cmd.Parameters.AddWithValue("@estado", Vehiculo.Estado);
 
-                    if (filas > 0)
-                    {
-                        return RedirectToPage("/Vehiculos");
-                    }
-                    else
-                    {
-                        Mensaje = "No se pudo registrar el vehículo.";
-                        return Page();
-                    }
-                }
-            }
-            catch (MySqlException ex)
-            {
-                Mensaje = "Error de MySQL: " + ex.Message;
-                return Page();
+                cmd.ExecuteNonQuery();
             }
             catch (Exception ex)
             {
-                Mensaje = "Error: " + ex.Message;
+                ModelState.AddModelError(
+                    "",
+                    "Error al guardar el vehículo: " + ex.Message
+                );
+
+                CargarClientes();
                 return Page();
             }
             finally
             {
-                _connection.Close();
+                if (_connection.State == System.Data.ConnectionState.Open)
+                {
+                    _connection.Close();
+                }
+            }
+
+            return RedirectToPage("/Vehiculos");
+        }
+
+        private void CargarClientes()
+        {
+            ListaClientes.Clear();
+
+            try
+            {
+                _connection.Open();
+
+                string query = @"SELECT id, CONCAT(nombre, ' ', apellido) AS NombreCompleto
+                                 FROM cliente
+                                 WHERE estado = 1
+                                 ORDER BY nombre ASC";
+
+                using MySqlCommand cmd = new MySqlCommand(query, _connection);
+                using MySqlDataReader reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    ListaClientes.Add(new SelectListItem
+                    {
+                        Value = reader["id"].ToString(),
+                        Text = reader["NombreCompleto"].ToString()
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error al cargar clientes: " + ex.Message);
+            }
+            finally
+            {
+                if (_connection.State == System.Data.ConnectionState.Open)
+                {
+                    _connection.Close();
+                }
             }
         }
     }

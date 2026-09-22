@@ -31,7 +31,6 @@ namespace TallerMecanicoScrum.Clases
         [Required(ErrorMessage = "La dirección es obligatoria")]
         [StringLength(200, ErrorMessage = "La dirección no puede superar 200 caracteres")]
         public string Direccion { get; set; } = "";
-
         public bool Estado { get; set; } = true;
 
         public DateTime FechaRegistro { get; set; }
