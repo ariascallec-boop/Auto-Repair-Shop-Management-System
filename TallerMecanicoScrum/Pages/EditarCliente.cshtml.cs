@@ -25,7 +25,6 @@ namespace TallerMecanicoScrum.Pages
         [BindProperty]
         public Cliente Cliente { get; set; } = new Cliente();
 
-        // Token protegido que identifica al cliente.
         [BindProperty]
         public string Token { get; set; } = "";
 
@@ -35,14 +34,10 @@ namespace TallerMecanicoScrum.Pages
 
             try
             {
-                // Validamos y recuperamos el ID real desde el token.
                 clienteId = int.Parse(_protector.Unprotect(id));
             }
             catch
             {
-                // Si el token fue modificado, es inválido
-                // o no puede convertirse correctamente,
-                // no se permite continuar.
                 return RedirectToPage("/Clientes");
             }
 
@@ -74,7 +69,6 @@ namespace TallerMecanicoScrum.Pages
                                 Estado = Convert.ToBoolean(reader["estado"])
                             };
 
-                            // Conservamos el token para el POST.
                             Token = id;
                         }
                         else
@@ -94,26 +88,30 @@ namespace TallerMecanicoScrum.Pages
 
         public IActionResult OnPost()
         {
-            // Limpiamos espacios al principio y al final.
-            Cliente.Nombre = Cliente.Nombre?.Trim();
-            Cliente.Apellido = Cliente.Apellido?.Trim();
-            Cliente.CiNit = Cliente.CiNit?.Trim();
-            Cliente.Telefono = Cliente.Telefono?.Trim();
-            Cliente.Email = Cliente.Email?.Trim();
-            Cliente.Direccion = Cliente.Direccion?.Trim();
+            Cliente.Nombre = NormalizarEspacios(Cliente.Nombre);
+            Cliente.Apellido = NormalizarEspacios(Cliente.Apellido);
+            Cliente.CiNit = NormalizarEspacios(Cliente.CiNit);
+            Cliente.Telefono = NormalizarEspacios(Cliente.Telefono);
+            Cliente.Email = NormalizarEspacios(Cliente.Email);
+            Cliente.Direccion = NormalizarEspacios(Cliente.Direccion);
+
+            Cliente.Nombre = NormalizarNombre(Cliente.Nombre);
+            Cliente.Apellido = NormalizarNombre(Cliente.Apellido);
+
+            ModelState.Clear();
+            TryValidateModel(Cliente, nameof(Cliente));
 
             if (!ModelState.IsValid)
             {
                 return Page();
             }
 
-            // Validación adicional del CI/NIT.
             if (!string.IsNullOrWhiteSpace(Cliente.CiNit) &&
                 !Regex.IsMatch(Cliente.CiNit, "^[0-9]+$"))
             {
                 ModelState.AddModelError(
                     "Cliente.CiNit",
-                    "El CI/NIT debe contener solo dígitos");
+                    "El CI/NIT debe contener solo dígitos.");
 
                 return Page();
             }
@@ -122,13 +120,10 @@ namespace TallerMecanicoScrum.Pages
 
             try
             {
-                // El ID utilizado para actualizar se obtiene
-                // exclusivamente del token protegido.
                 clienteId = int.Parse(_protector.Unprotect(Token));
             }
             catch
             {
-                // Token inválido o manipulado.
                 return RedirectToPage("/Clientes");
             }
 
@@ -153,10 +148,6 @@ namespace TallerMecanicoScrum.Pages
                     cmd.Parameters.AddWithValue("@telefono", Cliente.Telefono ?? "");
                     cmd.Parameters.AddWithValue("@email", Cliente.Email ?? "");
                     cmd.Parameters.AddWithValue("@direccion", Cliente.Direccion ?? "");
-
-                    // IMPORTANTE:
-                    // No usamos Cliente.Id.
-                    // Utilizamos el ID recuperado del token.
                     cmd.Parameters.AddWithValue("@id", clienteId);
 
                     cmd.ExecuteNonQuery();
@@ -168,6 +159,41 @@ namespace TallerMecanicoScrum.Pages
             }
 
             return RedirectToPage("/Clientes");
+        }
+
+        private string NormalizarEspacios(string texto)
+        {
+            if (texto == null)
+            {
+                return "";
+            }
+
+            texto = texto.Trim();
+            texto = Regex.Replace(texto, "\\s+", " ");
+
+            return texto;
+        }
+
+        private string NormalizarNombre(string texto)
+        {
+            if (string.IsNullOrWhiteSpace(texto))
+            {
+                return texto;
+            }
+
+            string[] partes = texto.Split(' ');
+
+            for (int i = 0; i < partes.Length; i++)
+            {
+                string parte = partes[i].ToLower();
+
+                if (parte.Length > 0)
+                {
+                    partes[i] = char.ToUpper(parte[0]) + parte.Substring(1);
+                }
+            }
+
+            return string.Join(" ", partes);
         }
     }
 }
