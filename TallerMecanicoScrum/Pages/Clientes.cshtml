@@ -87,6 +87,9 @@
 
                         @for (int i = 0; i < Model.ListaClientes.Count; i++)
                         {
+                            var cliente = Model.ListaClientes[i];
+                            var token = Model.GenerarToken(cliente.Id);
+
                             <tr>
 
                                 <td>
@@ -94,32 +97,32 @@
                                 </td>
 
                                 <td class="fw-semibold">
-                                    @Model.ListaClientes[i].CiNit
+                                    @cliente.CiNit
                                 </td>
 
                                 <td>
-                                    @Model.ListaClientes[i].Nombre
+                                    @cliente.Nombre
                                 </td>
 
                                 <td>
-                                    @Model.ListaClientes[i].Apellido
+                                    @cliente.Apellido
                                 </td>
 
                                 <td>
-                                    @Model.ListaClientes[i].Telefono
+                                    @cliente.Telefono
                                 </td>
 
                                 <td>
-                                    @Model.ListaClientes[i].Email
+                                    @cliente.Email
                                 </td>
 
                                 <td>
-                                    @Model.ListaClientes[i].Direccion
+                                    @cliente.Direccion
                                 </td>
 
                                 <td>
 
-                                    @if (Model.ListaClientes[i].Estado)
+                                    @if (cliente.Estado)
                                     {
                                         <span class="badge bg-success">
                                             Activo
@@ -136,8 +139,9 @@
 
                                 <td>
 
+                                    <!-- EDITAR -->
                                     <a asp-page="/EditarCliente"
-                                       asp-route-id="@Model.ListaClientes[i].Id"
+                                       asp-route-id="@token"
                                        class="btn btn-sm btn-warning">
 
                                         <i class="bi bi-pencil"></i>
@@ -145,17 +149,19 @@
 
                                     </a>
 
+                                    <!-- ELIMINAR -->
                                     <button type="button"
                                             class="btn btn-sm btn-danger"
                                             data-bs-toggle="modal"
-                                            data-bs-target="#modalEliminarCliente-@Model.ListaClientes[i].Id">
+                                            data-bs-target="#modalEliminarCliente-@cliente.Id">
 
                                         <i class="bi bi-trash"></i>
                                         Eliminar
+
                                     </button>
 
                                     <div class="modal fade"
-                                         id="modalEliminarCliente-@Model.ListaClientes[i].Id"
+                                         id="modalEliminarCliente-@cliente.Id"
                                          tabindex="-1"
                                          aria-hidden="true">
 
@@ -181,8 +187,8 @@
                                                     ¿Está seguro que desea eliminar al cliente:
 
                                                     <strong>
-                                                        @Model.ListaClientes[i].Nombre
-                                                        @Model.ListaClientes[i].Apellido
+                                                        @cliente.Nombre
+                                                        @cliente.Apellido
                                                     </strong>?
 
                                                 </div>
@@ -201,8 +207,8 @@
                                                           asp-page-handler="Eliminar">
 
                                                         <input type="hidden"
-                                                               name="id"
-                                                               value="@Model.ListaClientes[i].Id" />
+                                                               name="token"
+                                                               value="@token" />
 
                                                         <button type="submit"
                                                                 class="btn btn-danger">

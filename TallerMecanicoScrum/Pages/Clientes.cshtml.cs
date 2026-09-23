@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using MySql.Data.MySqlClient;
@@ -8,10 +9,16 @@ namespace TallerMecanicoScrum.Pages
     public class ClientesModel : PageModel
     {
         private readonly MySqlConnection _connection;
+        private readonly IDataProtector _protector;
 
-        public ClientesModel(MySqlConnection connection)
+        public ClientesModel(
+            MySqlConnection connection,
+            IDataProtectionProvider dataProtectionProvider)
         {
             _connection = connection;
+
+            _protector = dataProtectionProvider.CreateProtector(
+                "TallerMecanicoScrum.ClienteId");
         }
 
         public List<Cliente> ListaClientes { get; set; } = new List<Cliente>();
@@ -33,14 +40,36 @@ namespace TallerMecanicoScrum.Pages
             }
         }
 
-        public IActionResult OnPostEliminar(int id)
+        // Genera un token protegido para utilizarlo en la URL
+        // y evitar exponer directamente el ID real del cliente.
+        public string GenerarToken(int id)
         {
+            return _protector.Protect(id.ToString());
+        }
+
+        public IActionResult OnPostEliminar(string token)
+        {
+            int id;
+
+            try
+            {
+                // Recuperamos el ID real a partir del token protegido.
+                id = int.Parse(_protector.Unprotect(token));
+            }
+            catch
+            {
+                // Si el token fue alterado o no es válido,
+                // no se realiza ninguna operación.
+                return RedirectToPage("/Clientes");
+            }
+
             try
             {
                 _connection.Open();
 
-                // Borrado lógico usando 'id' en lugar de 'id_cliente'
-                string query = "UPDATE cliente SET estado = 0 WHERE id = @id";
+                string query = @"UPDATE cliente 
+                                 SET estado = 0 
+                                 WHERE id = @id";
 
                 using (MySqlCommand cmd = new MySqlCommand(query, _connection))
                 {
@@ -64,7 +93,6 @@ namespace TallerMecanicoScrum.Pages
             {
                 _connection.Open();
 
-                // Seleccionamos 'id' ajustado a tu esquema real
                 string query = @"SELECT id, ci_nit, nombre, apellido, telefono, email, direccion, estado 
                                  FROM cliente 
                                  WHERE estado = 1";

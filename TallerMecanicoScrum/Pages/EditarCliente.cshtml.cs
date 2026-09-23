@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using MySql.Data.MySqlClient;
@@ -8,17 +9,41 @@ namespace TallerMecanicoScrum.Pages
     public class EditarClienteModel : PageModel
     {
         private readonly MySqlConnection _connection;
+        private readonly IDataProtector _protector;
 
-        public EditarClienteModel(MySqlConnection connection)
+        public EditarClienteModel(
+            MySqlConnection connection,
+            IDataProtectionProvider dataProtectionProvider)
         {
             _connection = connection;
+
+            _protector = dataProtectionProvider.CreateProtector(
+                "TallerMecanicoScrum.ClienteId");
         }
 
         [BindProperty]
         public Cliente Cliente { get; set; } = new Cliente();
 
-        public IActionResult OnGet(int id)
+        // Token protegido que identifica al cliente.
+        [BindProperty]
+        public string Token { get; set; } = "";
+
+        public IActionResult OnGet(string id)
         {
+            int clienteId;
+
+            try
+            {
+                // Validamos y recuperamos el ID real desde el token.
+                clienteId = int.Parse(_protector.Unprotect(id));
+            }
+            catch
+            {
+                // Si el token fue modificado, es inválido o no puede
+                // convertirse correctamente, no se permite continuar.
+                return RedirectToPage("/Clientes");
+            }
+
             try
             {
                 _connection.Open();
@@ -29,7 +54,7 @@ namespace TallerMecanicoScrum.Pages
 
                 using (MySqlCommand cmd = new MySqlCommand(query, _connection))
                 {
-                    cmd.Parameters.AddWithValue("@id", id);
+                    cmd.Parameters.AddWithValue("@id", clienteId);
 
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
@@ -46,6 +71,9 @@ namespace TallerMecanicoScrum.Pages
                                 Direccion = reader["direccion"]?.ToString() ?? "",
                                 Estado = Convert.ToBoolean(reader["estado"])
                             };
+
+                            // Conservamos el token para el POST.
+                            Token = id;
                         }
                         else
                         {
@@ -69,6 +97,20 @@ namespace TallerMecanicoScrum.Pages
                 return Page();
             }
 
+            int clienteId;
+
+            try
+            {
+                // El ID utilizado para actualizar se obtiene
+                // exclusivamente del token protegido.
+                clienteId = int.Parse(_protector.Unprotect(Token));
+            }
+            catch
+            {
+                // Token inválido o manipulado.
+                return RedirectToPage("/Clientes");
+            }
+
             try
             {
                 _connection.Open();
@@ -90,7 +132,11 @@ namespace TallerMecanicoScrum.Pages
                     cmd.Parameters.AddWithValue("@telefono", Cliente.Telefono ?? "");
                     cmd.Parameters.AddWithValue("@email", Cliente.Email ?? "");
                     cmd.Parameters.AddWithValue("@direccion", Cliente.Direccion ?? "");
-                    cmd.Parameters.AddWithValue("@id", Cliente.Id);
+
+                    // IMPORTANTE:
+                    // No usamos Cliente.Id.
+                    // Utilizamos el ID recuperado del token.
+                    cmd.Parameters.AddWithValue("@id", clienteId);
 
                     cmd.ExecuteNonQuery();
                 }
