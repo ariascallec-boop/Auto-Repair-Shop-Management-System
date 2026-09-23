@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>@ViewData["Title"] - Taller Mecánico</title>
+    <title>@ViewData["Title"] - AlánezMotors</title>
 
     <link rel="stylesheet"
           href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
@@ -28,24 +28,9 @@
         <!-- SIDEBAR -->
         <aside class="sidebar d-flex flex-column text-white">
 
-            <div class="p-4 border-bottom border-secondary">
-                <div class="d-flex align-items-center gap-3">
-
-                    <i class="bi bi-tools fs-2 text-warning"></i>
-
-                    <div>
-                        <h5 class="mb-0 fw-bold">
-                            Taller Mecánico
-                        </h5>
-
-                        <small class="text-light">
-                            Gestión del taller
-                        </small>
-                    </div>
-
-                </div>
+            <div class="p-3 border-bottom border-secondary text-center">
+                <img src="~/images/alanezmotors.png" alt="AlánezMotors" class="logo-sidebar" />
             </div>
-
 
             <nav class="nav flex-column p-3 gap-2">
 
@@ -56,14 +41,12 @@
                     Inicio
                 </a>
 
-
                 <a asp-page="/Clientes"
                    class="nav-link sidebar-link @(currentPage.StartsWith("/Clientes") ? "active" : "")">
 
                     <i class="bi bi-people me-2"></i>
                     Clientes
                 </a>
-
 
                 <a asp-page="/Vehiculos"
                    class="nav-link sidebar-link @(currentPage.StartsWith("/Vehiculos") ? "active" : "")">
@@ -72,14 +55,12 @@
                     Vehículos
                 </a>
 
-
                 <a asp-page="/OrdenesTrabajo/Index"
                    class="nav-link sidebar-link @(currentPage.StartsWith("/OrdenesTrabajo") ? "active" : "")">
 
                     <i class="bi bi-clipboard-check me-2"></i>
                     Órdenes de Trabajo
                 </a>
-
 
                 <a asp-page="/Servicios"
                    class="nav-link sidebar-link @(currentPage.StartsWith("/Servicios") ? "active" : "")">
@@ -88,14 +69,12 @@
                     Servicios
                 </a>
 
-
                 <a asp-page="/Repuestos/Index"
                    class="nav-link sidebar-link @(currentPage.StartsWith("/Repuestos") ? "active" : "")">
 
                     <i class="bi bi-box-seam me-2"></i>
                     Repuestos
                 </a>
-
 
                 <a asp-page="/Entregas/Index"
                    class="nav-link sidebar-link @(currentPage.StartsWith("/Entregas") ? "active" : "")">
@@ -107,7 +86,6 @@
             </nav>
 
         </aside>
-
 
         <!-- CONTENIDO -->
         <div class="flex-grow-1 bg-light">
@@ -121,15 +99,12 @@
                         @ViewData["Title"]
                     </h5>
 
-
                     <div class="d-flex align-items-center gap-4 text-secondary">
 
                         <div>
                             <i class="bi bi-calendar3 me-2"></i>
-
                             @DateTime.Now.ToString("dd/MM/yyyy")
                         </div>
-
 
                         <div>
                             <i class="bi bi-person-circle fs-5 me-2 text-primary"></i>
@@ -142,20 +117,15 @@
 
             </header>
 
-
             <main class="p-4">
-
                 @RenderBody()
-
             </main>
 
         </div>
 
     </div>
 
-
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
-
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 
     <script src="~/js/site.js"

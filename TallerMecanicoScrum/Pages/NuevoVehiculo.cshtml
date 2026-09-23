@@ -5,206 +5,104 @@
     ViewData["Title"] = "Nuevo Vehículo";
 }
 
-<div class="container-fluid">
+<div class="container">
 
     <div class="mb-4">
-        <h2 class="fw-bold mb-1">
-            Nuevo Vehículo
-        </h2>
-
-        <p class="text-muted mb-0">
-            Registrar un nuevo vehículo en el sistema
-        </p>
+        <h2 class="fw-bold">Nuevo Vehículo</h2>
+        <p class="text-muted">Registrar un nuevo vehículo</p>
     </div>
 
     <div class="card shadow-sm border-0">
-
         <div class="card-body">
 
             <form method="post">
 
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
                 <div class="row g-3">
 
                     <div class="col-md-6">
-
-                        <label class="form-label">
-                            Placa
-                        </label>
-
-                        <input asp-for="Vehiculo.Placa"
-                               class="form-control"
-                               placeholder="Ej. 1234ABC" />
-
-                        <span asp-validation-for="Vehiculo.Placa"
-                              class="text-danger small"></span>
-
+                        <label asp-for="Vehiculo.Placa" class="form-label">Placa</label>
+                        <input asp-for="Vehiculo.Placa" class="form-control" placeholder="Ej: 5214BEX" />
+                        <span asp-validation-for="Vehiculo.Placa" class="text-danger small"></span>
                     </div>
 
                     <div class="col-md-6">
-
-                        <label class="form-label">
-                            Marca
-                        </label>
-
-                        <input asp-for="Vehiculo.Marca"
-                               class="form-control"
-                               placeholder="Ej. Toyota" />
-
-                        <span asp-validation-for="Vehiculo.Marca"
-                              class="text-danger small"></span>
-
+                        <label asp-for="Vehiculo.Marca" class="form-label">Marca</label>
+                        <input asp-for="Vehiculo.Marca" class="form-control" placeholder="Ej: Toyota" />
+                        <span asp-validation-for="Vehiculo.Marca" class="text-danger small"></span>
                     </div>
 
                     <div class="col-md-6">
-
-                        <label class="form-label">
-                            Modelo
-                        </label>
-
-                        <input asp-for="Vehiculo.Modelo"
-                               class="form-control"
-                               placeholder="Ej. Corolla" />
-
-                        <span asp-validation-for="Vehiculo.Modelo"
-                              class="text-danger small"></span>
-
+                        <label asp-for="Vehiculo.Modelo" class="form-label">Modelo</label>
+                        <input asp-for="Vehiculo.Modelo" class="form-control" placeholder="Ej: Corolla" />
+                        <span asp-validation-for="Vehiculo.Modelo" class="text-danger small"></span>
                     </div>
 
                     <div class="col-md-6">
-
-                        <label class="form-label">
-                            Año
-                        </label>
-
-                        <input asp-for="Vehiculo.Anio"
-                               type="number"
-                               class="form-control"
-                               placeholder="Ej. 2020" />
-
-                        <span asp-validation-for="Vehiculo.Anio"
-                              class="text-danger small"></span>
-
+                        <label asp-for="Vehiculo.Anio" class="form-label">Año</label>
+                        <input asp-for="Vehiculo.Anio" type="number" class="form-control" />
+                        <span asp-validation-for="Vehiculo.Anio" class="text-danger small"></span>
                     </div>
 
                     <div class="col-md-6">
-
-                        <label class="form-label">
-                            Color
-                        </label>
-
-                        <input asp-for="Vehiculo.Color"
-                               class="form-control"
-                               placeholder="Ej. Blanco" />
-
-                        <span asp-validation-for="Vehiculo.Color"
-                              class="text-danger small"></span>
-
+                        <label asp-for="Vehiculo.Color" class="form-label">Color</label>
+                        <input asp-for="Vehiculo.Color" class="form-control" placeholder="Ej: Blanco" />
+                        <span asp-validation-for="Vehiculo.Color" class="text-danger small"></span>
                     </div>
 
                     <div class="col-md-6">
+                        <label asp-for="Vehiculo.Tipo" class="form-label">Tipo</label>
 
-                        <label class="form-label">
-                            Tipo
-                        </label>
-
-                        <select asp-for="Vehiculo.Tipo"
-                                class="form-select">
-
-                            <option value="">
-                                Seleccione un tipo
-                            </option>
-
-                            <option value="Sedán">
-                                Sedán
-                            </option>
-
-                            <option value="SUV">
-                                SUV
-                            </option>
-
-                            <option value="Camioneta">
-                                Camioneta
-                            </option>
-
-                            <option value="Hatchback">
-                                Hatchback
-                            </option>
-
-                            <option value="Van">
-                                Van
-                            </option>
-
+                        <select asp-for="Vehiculo.Tipo" class="form-select">
+                            <option value="">Seleccione un tipo</option>
+                            <option value="Sedán">Sedán</option>
+                            <option value="SUV">SUV</option>
+                            <option value="Camioneta">Camioneta</option>
+                            <option value="Hatchback">Hatchback</option>
+                            <option value="Van">Van</option>
                         </select>
 
-                        <span asp-validation-for="Vehiculo.Tipo"
-                              class="text-danger small"></span>
-
+                        <span asp-validation-for="Vehiculo.Tipo" class="text-danger small"></span>
                     </div>
 
                     <div class="col-md-6">
-
-                        <label class="form-label">
-                            Kilometraje
-                        </label>
-
-                        <input asp-for="Vehiculo.Kilometraje"
-                               type="number"
-                               class="form-control"
-                               placeholder="Ej. 85000" />
-
-                        <span asp-validation-for="Vehiculo.Kilometraje"
-                              class="text-danger small"></span>
-
+                        <label asp-for="Vehiculo.Kilometraje" class="form-label">Kilometraje</label>
+                        <input asp-for="Vehiculo.Kilometraje" type="number" class="form-control" min="0" />
+                        <span asp-validation-for="Vehiculo.Kilometraje" class="text-danger small"></span>
                     </div>
 
                     <div class="col-md-6">
+                        <label class="form-label">Cliente / Dueño</label>
 
-                        <label class="form-label">
-                            Cliente
-                        </label>
+                        <input asp-for="ClienteSeleccionado" list="listaClientes" class="form-control" placeholder="Escriba nombre, apellido o CI/NIT" autocomplete="off" />
 
-                        <select asp-for="Vehiculo.ClienteId"
-                                asp-items="Model.ListaClientes"
-                                class="form-select">
+                        <datalist id="listaClientes">
+                            @for (int i = 0; i < Model.ListaClientes.Count; i++)
+                            {
+                                <option value="@Model.ListaClientes[i]"></option>
+                            }
+                        </datalist>
 
-                            <option value="">
-                                Seleccione un cliente
-                            </option>
-
-                        </select>
-
-                        <span asp-validation-for="Vehiculo.ClienteId"
-                              class="text-danger small"></span>
-
+                        <span asp-validation-for="ClienteSeleccionado" class="text-danger small"></span>
                     </div>
 
                 </div>
 
-                <hr class="my-4" />
-
-                <div class="d-flex justify-content-end gap-2">
-
-                    <a asp-page="/Vehiculos"
-                       class="btn btn-secondary">
-
-                        Cancelar
-
-                    </a>
-
-                    <button type="submit"
-                            class="btn btn-primary">
-
+                <div class="mt-4 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">
                         <i class="bi bi-save me-1"></i>
-                        Guardar Vehículo
-
+                        Guardar
                     </button>
 
+                    <a asp-page="/Vehiculos" class="btn btn-secondary">
+                        Cancelar
+                    </a>
                 </div>
 
             </form>
 
         </div>
-
     </div>
 
 </div>

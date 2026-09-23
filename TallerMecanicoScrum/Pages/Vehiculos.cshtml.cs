@@ -33,15 +33,16 @@ namespace TallerMecanicoScrum.Pages
 
                 string query = "UPDATE vehiculo SET estado = 0 WHERE id = @id";
 
-                using (MySqlCommand cmd = new MySqlCommand(query, _connection))
-                {
-                    cmd.Parameters.AddWithValue("@id", id);
-                    cmd.ExecuteNonQuery();
-                }
+                using MySqlCommand cmd = new MySqlCommand(query, _connection);
+                cmd.Parameters.AddWithValue("@id", id);
+                cmd.ExecuteNonQuery();
             }
             finally
             {
-                _connection.Close();
+                if (_connection.State == System.Data.ConnectionState.Open)
+                {
+                    _connection.Close();
+                }
             }
 
             return RedirectToPage("/Vehiculos");
@@ -55,51 +56,58 @@ namespace TallerMecanicoScrum.Pages
             {
                 _connection.Open();
 
-                string query = @"SELECT id, placa, marca, modelo, anio, color, tipo, kilometraje, cliente_id, estado 
-                                 FROM vehiculo 
-                                 WHERE estado = 1";
+                string query = @"SELECT v.id, v.placa, v.marca, v.modelo, v.anio, v.color, v.tipo, v.kilometraje, v.cliente_id, v.estado,
+                                 CONCAT(c.nombre, ' ', c.apellido) AS cliente_nombre
+                                 FROM vehiculo v
+                                 INNER JOIN cliente c ON v.cliente_id = c.id
+                                 WHERE v.estado = 1";
 
                 if (!string.IsNullOrWhiteSpace(Buscar))
                 {
-                    query += @" AND (placa LIKE @buscar 
-                                 OR marca LIKE @buscar 
-                                 OR modelo LIKE @buscar 
-                                 OR tipo LIKE @buscar)";
+                    query += @" AND (v.placa LIKE @buscar
+                                OR v.marca LIKE @buscar
+                                OR v.modelo LIKE @buscar
+                                OR v.tipo LIKE @buscar
+                                OR c.nombre LIKE @buscar
+                                OR c.apellido LIKE @buscar
+                                OR c.ci_nit LIKE @buscar)";
                 }
 
-                query += " ORDER BY id DESC";
+                query += " ORDER BY v.id DESC";
 
-                using (MySqlCommand cmd = new MySqlCommand(query, _connection))
+                using MySqlCommand cmd = new MySqlCommand(query, _connection);
+
+                if (!string.IsNullOrWhiteSpace(Buscar))
                 {
-                    if (!string.IsNullOrWhiteSpace(Buscar))
-                    {
-                        cmd.Parameters.AddWithValue("@buscar", $"%{Buscar}%");
-                    }
+                    cmd.Parameters.AddWithValue("@buscar", "%" + Buscar + "%");
+                }
 
-                    using (MySqlDataReader reader = cmd.ExecuteReader())
+                using MySqlDataReader reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    ListaVehiculos.Add(new Vehiculo
                     {
-                        while (reader.Read())
-                        {
-                            ListaVehiculos.Add(new Vehiculo
-                            {
-                                Id = Convert.ToInt32(reader["id"]),
-                                Placa = reader["placa"]?.ToString() ?? "",
-                                Marca = reader["marca"]?.ToString() ?? "",
-                                Modelo = reader["modelo"]?.ToString() ?? "",
-                                Anio = Convert.ToInt32(reader["anio"]),
-                                Color = reader["color"]?.ToString() ?? "",
-                                Tipo = reader["tipo"]?.ToString() ?? "",
-                                Kilometraje = Convert.ToInt32(reader["kilometraje"]),
-                                ClienteId = Convert.ToInt32(reader["cliente_id"]),
-                                Estado = Convert.ToBoolean(reader["estado"])
-                            });
-                        }
-                    }
+                        Id = Convert.ToInt32(reader["id"]),
+                        Placa = reader["placa"]?.ToString() ?? "",
+                        Marca = reader["marca"]?.ToString() ?? "",
+                        Modelo = reader["modelo"]?.ToString() ?? "",
+                        Anio = Convert.ToInt32(reader["anio"]),
+                        Color = reader["color"]?.ToString() ?? "",
+                        Tipo = reader["tipo"]?.ToString() ?? "",
+                        Kilometraje = Convert.ToInt32(reader["kilometraje"]),
+                        ClienteId = Convert.ToInt32(reader["cliente_id"]),
+                        ClienteNombre = reader["cliente_nombre"]?.ToString() ?? "",
+                        Estado = Convert.ToBoolean(reader["estado"])
+                    });
                 }
             }
             finally
             {
-                _connection.Close();
+                if (_connection.State == System.Data.ConnectionState.Open)
+                {
+                    _connection.Close();
+                }
             }
         }
     }

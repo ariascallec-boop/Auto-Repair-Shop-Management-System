@@ -85,3 +85,10 @@ body {
                 font-size: 20px;
             }
 }
+.logo-sidebar {
+    width: 210px;
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+}
