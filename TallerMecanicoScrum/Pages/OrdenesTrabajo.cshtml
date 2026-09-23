@@ -1,0 +1,450 @@
+﻿@page
+@model TallerMecanicoScrum.Pages.OrdenesTrabajoModel
+
+@{
+    ViewData["Title"] = "Órdenes de Trabajo";
+}
+
+<div class="container-fluid">
+
+    <!-- ENCABEZADO -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+            <h2 class="fw-bold mb-1">Órdenes de Trabajo</h2>
+
+            <p class="text-muted mb-0">
+                Gestión y seguimiento de las órdenes del taller
+            </p>
+        </div>
+
+        <div>
+            <a asp-page="/NuevaOrdenTrabajo" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-1"></i>
+                Nueva Orden
+            </a>
+        </div>
+
+    </div>
+
+
+    <!-- TARJETAS RESUMEN -->
+    <div class="row mb-4">
+
+        <div class="col-md-4 mb-3">
+
+            <div class="card shadow-sm border-0 h-100">
+
+                <div class="card-body">
+
+                    <div class="d-flex justify-content-between align-items-center">
+
+                        <div>
+                            <p class="text-muted mb-1">
+                                Total de órdenes
+                            </p>
+
+                            <h3 class="fw-bold mb-0">
+                                @Model.ListaOrdenes.Count
+                            </h3>
+                        </div>
+
+                        <div class="text-primary fs-1">
+                            <i class="bi bi-clipboard-check"></i>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-4 mb-3">
+
+            <div class="card shadow-sm border-0 h-100">
+
+                <div class="card-body">
+
+                    <div class="d-flex justify-content-between align-items-center">
+
+                        <div>
+                            <p class="text-muted mb-1">
+                                En reparación
+                            </p>
+
+                            <h3 class="fw-bold mb-0">
+
+                                @Model.ListaOrdenes.Count(x =>
+                                    x.Estado == "en_reparacion")
+
+                            </h3>
+                        </div>
+
+                        <div class="text-warning fs-1">
+                            <i class="bi bi-tools"></i>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-4 mb-3">
+
+            <div class="card shadow-sm border-0 h-100">
+
+                <div class="card-body">
+
+                    <div class="d-flex justify-content-between align-items-center">
+
+                        <div>
+                            <p class="text-muted mb-1">
+                                Listas para entrega
+                            </p>
+
+                            <h3 class="fw-bold mb-0">
+
+                                @Model.ListaOrdenes.Count(x =>
+                                    x.Estado == "listo_para_entrega")
+
+                            </h3>
+                        </div>
+
+                        <div class="text-success fs-1">
+                            <i class="bi bi-check-circle"></i>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- BUSCADOR -->
+    <div class="card shadow-sm border-0 mb-4">
+
+        <div class="card-body">
+
+            <form method="get">
+
+                <div class="row">
+
+                    <div class="col-md-10">
+
+                        <input type="text"
+                               name="buscar"
+                               value="@Model.Buscar"
+                               class="form-control"
+                               placeholder="Buscar por placa, cliente, vehículo o estado..." />
+
+                    </div>
+
+                    <div class="col-md-2">
+
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-search me-1"></i>
+                            Buscar
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- TABLA -->
+    <div class="card shadow-sm border-0">
+
+        <div class="card-body">
+
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle">
+
+                    <thead class="table-light">
+
+                        <tr>
+
+                            <th>N°</th>
+                            <th>Placa</th>
+                            <th>Cliente</th>
+                            <th>Vehículo</th>
+                            <th>Ingreso</th>
+                            <th>Estado</th>
+                            <th>Responsable</th>
+                            <th>Entrega</th>
+                            <th class="text-center">Acciones</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        @if (Model.ListaOrdenes.Count == 0)
+                        {
+                            <tr>
+
+                                <td colspan="9" class="text-center text-muted py-4">
+
+                                    <i class="bi bi-inbox fs-2 d-block mb-2"></i>
+
+                                    No se encontraron órdenes de trabajo.
+
+                                </td>
+
+                            </tr>
+                        }
+                        else
+                        {
+                            for (int i = 0; i < Model.ListaOrdenes.Count; i++)
+                            {
+                                <tr>
+
+                                    <td>
+                                        @Model.ListaOrdenes[i].Id
+                                    </td>
+
+                                    <td>
+                                        <strong>
+                                            @Model.ListaOrdenes[i].Placa
+                                        </strong>
+                                    </td>
+
+                                    <td>
+                                        @Model.ListaOrdenes[i].Cliente
+                                    </td>
+
+                                    <td>
+                                        @Model.ListaOrdenes[i].Vehiculo
+                                    </td>
+
+                                    <td>
+                                        @Model.ListaOrdenes[i].FechaIngreso.ToString("dd/MM/yyyy")
+                                    </td>
+
+                                    <td>
+
+                                        @if (Model.ListaOrdenes[i].Estado == "recibido")
+                                        {
+                                            <span class="badge bg-secondary">
+                                                Recibido
+                                            </span>
+                                        }
+                                        else if (Model.ListaOrdenes[i].Estado == "en_revision")
+                                        {
+                                            <span class="badge bg-info">
+                                                En revisión
+                                            </span>
+                                        }
+                                        else if (Model.ListaOrdenes[i].Estado == "cotizado")
+                                        {
+                                            <span class="badge bg-warning text-dark">
+                                                Cotizado
+                                            </span>
+                                        }
+                                        else if (Model.ListaOrdenes[i].Estado == "esperando_aprobacion")
+                                        {
+                                            <span class="badge bg-warning text-dark">
+                                                Esperando aprobación
+                                            </span>
+                                        }
+                                        else if (Model.ListaOrdenes[i].Estado == "aprobado")
+                                        {
+                                            <span class="badge bg-primary">
+                                                Aprobado
+                                            </span>
+                                        }
+                                        else if (Model.ListaOrdenes[i].Estado == "en_reparacion")
+                                        {
+                                            <span class="badge bg-warning text-dark">
+                                                En reparación
+                                            </span>
+                                        }
+                                        else if (Model.ListaOrdenes[i].Estado == "esperando_repuesto")
+                                        {
+                                            <span class="badge bg-danger">
+                                                Esperando repuesto
+                                            </span>
+                                        }
+                                        else if (Model.ListaOrdenes[i].Estado == "esperando_pago")
+                                        {
+                                            <span class="badge bg-warning text-dark">
+                                                Esperando pago
+                                            </span>
+                                        }
+                                        else if (Model.ListaOrdenes[i].Estado == "listo_para_prueba")
+                                        {
+                                            <span class="badge bg-info">
+                                                Listo para prueba
+                                            </span>
+                                        }
+                                        else if (Model.ListaOrdenes[i].Estado == "en_prueba")
+                                        {
+                                            <span class="badge bg-primary">
+                                                En prueba
+                                            </span>
+                                        }
+                                        else if (Model.ListaOrdenes[i].Estado == "listo_para_entrega")
+                                        {
+                                            <span class="badge bg-success">
+                                                Listo para entrega
+                                            </span>
+                                        }
+                                        else if (Model.ListaOrdenes[i].Estado == "entregado")
+                                        {
+                                            <span class="badge bg-success">
+                                                Entregado
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">
+                                                @Model.ListaOrdenes[i].Estado
+                                            </span>
+                                        }
+
+                                    </td>
+
+                                    <td>
+                                        @Model.ListaOrdenes[i].Responsable
+                                    </td>
+
+                                    <td>
+                                        @Model.ListaOrdenes[i].FechaEntregaEstimada.ToString("dd/MM/yyyy HH:mm")
+                                    </td>
+
+                                    <td class="text-center">
+
+                                        <a asp-page="/EditarOrdenesTrabajo"
+                                           asp-route-id="@Model.ListaOrdenes[i].Id"
+                                           class="btn btn-sm btn-outline-primary me-1">
+
+                                            <i class="bi bi-pencil"></i>
+
+                                        </a>
+
+                                        <button type="button"
+                                                class="btn btn-sm btn-outline-danger"
+                                                onclick="prepararEliminar(@Model.ListaOrdenes[i].Id)">
+
+                                            <i class="bi bi-trash"></i>
+
+                                        </button>
+
+                                    </td>
+
+                                </tr>
+                            }
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- MODAL ELIMINAR -->
+<div class="modal fade" id="modalEliminar" tabindex="-1">
+
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5 class="modal-title">
+                    Eliminar orden
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal">
+                </button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <p>
+                    ¿Está seguro de que desea eliminar esta orden de trabajo?
+                </p>
+
+                <p class="text-muted mb-0">
+                    La orden será desactivada y no se eliminará físicamente
+                    de la base de datos.
+                </p>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button type="button"
+                        class="btn btn-secondary"
+                        data-bs-dismiss="modal">
+
+                    Cancelar
+
+                </button>
+
+                <form method="post" asp-page-handler="Eliminar">
+
+                    <input type="hidden"
+                           id="ordenEliminarId"
+                           name="id" />
+
+                    <button type="submit" class="btn btn-danger">
+
+                        Eliminar
+
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    function prepararEliminar(id) {
+
+        document.getElementById("ordenEliminarId").value = id;
+
+        var modal = new bootstrap.Modal(
+            document.getElementById("modalEliminar")
+        );
+
+        modal.show();
+    }
+
+</script>

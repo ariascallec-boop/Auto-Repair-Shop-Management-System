@@ -1,0 +1,350 @@
+﻿@page
+@model TallerMecanicoScrum.Pages.EditarOrdenesTrabajoModel
+
+@{
+    ViewData["Title"] = "Editar Orden de Trabajo";
+}
+
+<div class="container-fluid">
+
+    <!-- ENCABEZADO -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+            <h2 class="fw-bold mb-1">
+                Editar Orden de Trabajo
+            </h2>
+
+            <p class="text-muted mb-0">
+                Modificar información y estado de la orden
+            </p>
+        </div>
+
+        <div>
+
+            <a
+                asp-page="/OrdenesTrabajo"
+                class="btn btn-outline-secondary">
+
+                <i class="bi bi-arrow-left me-1"></i>
+                Volver
+
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- FORMULARIO -->
+    <div class="card shadow-sm border-0">
+
+        <div class="card-body p-4">
+
+            <form method="post">
+
+                <!-- ID -->
+                <input
+                    type="hidden"
+                    asp-for="EntidadOrden.Id" />
+
+                <input
+                    type="hidden"
+                    asp-for="EntidadOrden.VehiculoId" />
+
+
+                <!-- INFORMACIÓN DEL VEHÍCULO -->
+                <div class="card bg-light border-0 mb-4">
+
+                    <div class="card-body">
+
+                        <h5 class="fw-bold mb-3">
+                            Información del vehículo
+                        </h5>
+
+                        <div class="row">
+
+                            <div class="col-md-4 mb-3">
+
+                                <label class="form-label text-muted">
+                                    Placa
+                                </label>
+
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    value="@Model.Placa"
+                                    readonly />
+
+                            </div>
+
+
+                            <div class="col-md-4 mb-3">
+
+                                <label class="form-label text-muted">
+                                    Cliente
+                                </label>
+
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    value="@Model.Cliente"
+                                    readonly />
+
+                            </div>
+
+
+                            <div class="col-md-4 mb-3">
+
+                                <label class="form-label text-muted">
+                                    Vehículo
+                                </label>
+
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    value="@Model.Vehiculo"
+                                    readonly />
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- INFORMACIÓN DE LA ORDEN -->
+                <div class="row">
+
+                    <!-- FECHA INGRESO -->
+                    <div class="col-md-6 mb-4">
+
+                        <label class="form-label fw-semibold">
+                            Fecha de ingreso
+                        </label>
+
+                        <input
+                            type="text"
+                            class="form-control"
+                            value="@Model.EntidadOrden.FechaIngreso.ToString("dd/MM/yyyy HH:mm")"
+                            readonly />
+
+                    </div>
+
+
+                    <!-- FECHA ENTREGA -->
+                    <div class="col-md-6 mb-4">
+
+                        <label
+                            asp-for="EntidadOrden.FechaEntregaEstimada"
+                            class="form-label fw-semibold">
+
+                            Fecha estimada de entrega
+
+                        </label>
+
+                        <input
+                            asp-for="EntidadOrden.FechaEntregaEstimada"
+                            type="datetime-local"
+                            class="form-control" />
+
+                        <span
+                            asp-validation-for="EntidadOrden.FechaEntregaEstimada"
+                            class="text-danger">
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ESTADO -->
+                <div class="mb-4">
+
+                    <label
+                        asp-for="EntidadOrden.Estado"
+                        class="form-label fw-semibold">
+
+                        Estado de la orden
+
+                    </label>
+
+                    <select
+                        asp-for="EntidadOrden.Estado"
+                        class="form-select">
+
+                        <option value="recibido">
+                            Recibido
+                        </option>
+
+                        <option value="en_revision">
+                            En revisión
+                        </option>
+
+                        <option value="cotizado">
+                            Cotizado
+                        </option>
+
+                        <option value="esperando_aprobacion">
+                            Esperando aprobación
+                        </option>
+
+                        <option value="aprobado">
+                            Aprobado
+                        </option>
+
+                        <option value="en_reparacion">
+                            En reparación
+                        </option>
+
+                        <option value="esperando_repuesto">
+                            Esperando repuesto
+                        </option>
+
+                        <option value="esperando_pago">
+                            Esperando pago
+                        </option>
+
+                        <option value="listo_para_prueba">
+                            Listo para prueba
+                        </option>
+
+                        <option value="en_prueba">
+                            En prueba
+                        </option>
+
+                        <option value="listo_para_entrega">
+                            Listo para entrega
+                        </option>
+
+                        <option value="entregado">
+                            Entregado
+                        </option>
+
+                    </select>
+
+                    <span
+                        asp-validation-for="EntidadOrden.Estado"
+                        class="text-danger">
+                    </span>
+
+                </div>
+
+
+                <!-- DIAGNÓSTICO -->
+                <div class="mb-4">
+
+                    <label
+                        asp-for="EntidadOrden.Diagnostico"
+                        class="form-label fw-semibold">
+
+                        Diagnóstico
+
+                    </label>
+
+                    <textarea
+                        asp-for="EntidadOrden.Diagnostico"
+                        class="form-control"
+                        rows="5">
+                    </textarea>
+
+                    <span
+                        asp-validation-for="EntidadOrden.Diagnostico"
+                        class="text-danger">
+                    </span>
+
+                </div>
+
+
+                <!-- NOTIFICACIÓN -->
+                <div class="card bg-light border-0 mb-4">
+
+                    <div class="card-body">
+
+                        <h5 class="fw-bold mb-3">
+                            Notificación
+                        </h5>
+
+                        <div class="row">
+
+                            <div class="col-md-6 mb-3">
+
+                                <label
+                                    asp-for="EntidadOrden.FechaNotificacion"
+                                    class="form-label">
+
+                                    Fecha de notificación
+
+                                </label>
+
+                                <input
+                                    asp-for="EntidadOrden.FechaNotificacion"
+                                    type="datetime-local"
+                                    class="form-control" />
+
+                            </div>
+
+
+                            <div class="col-md-6 mb-3">
+
+                                <label
+                                    asp-for="EntidadOrden.ObservacionesNotificacion"
+                                    class="form-label">
+
+                                    Observaciones de notificación
+
+                                </label>
+
+                                <input
+                                    asp-for="EntidadOrden.ObservacionesNotificacion"
+                                    type="text"
+                                    class="form-control"
+                                    placeholder="Observaciones..." />
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- BOTONES -->
+                <div class="d-flex justify-content-end gap-2">
+
+                    <a
+                        asp-page="/OrdenesTrabajo"
+                        class="btn btn-secondary">
+
+                        Cancelar
+
+                    </a>
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary">
+
+                        <i class="bi bi-save me-1"></i>
+                        Guardar cambios
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@section Scripts {
+
+    <partial name="_ValidationScriptsPartial" />
+
+}
