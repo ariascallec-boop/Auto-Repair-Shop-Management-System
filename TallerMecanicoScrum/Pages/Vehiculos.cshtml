@@ -62,12 +62,15 @@
             </form>
 
             @if (!string.IsNullOrWhiteSpace(Model.Buscar) &&
-                        Model.ListaVehiculos.Count == 0)
+                 Model.ListaVehiculos.Count == 0)
             {
                 <div class="alert alert-warning mb-3">
+
                     <i class="bi bi-exclamation-triangle me-1"></i>
+
                     No se encontraron vehículos para la búsqueda
                     <strong>"@Model.Buscar"</strong>.
+
                 </div>
             }
 
@@ -78,6 +81,7 @@
                     <thead class="table-light">
 
                         <tr>
+
                             <th>N°</th>
                             <th>Placa</th>
                             <th>Marca</th>
@@ -89,6 +93,7 @@
                             <th>Cliente</th>
                             <th>Estado</th>
                             <th>Acciones</th>
+
                         </tr>
 
                     </thead>
@@ -154,8 +159,9 @@
 
                                 <td>
 
+                                    <!-- EDITAR CON TOKEN -->
                                     <a asp-page="/EditarVehiculo"
-                                       asp-route-id="@Model.ListaVehiculos[i].Id"
+                                       asp-route-id="@Model.GenerarToken(Model.ListaVehiculos[i].Id)"
                                        class="btn btn-sm btn-warning">
 
                                         <i class="bi bi-pencil"></i>
@@ -200,10 +206,12 @@
                                                     ¿Está seguro que desea eliminar el vehículo:
 
                                                     <strong>
+
                                                         @Model.ListaVehiculos[i].Marca
                                                         @Model.ListaVehiculos[i].Modelo
                                                         -
                                                         @Model.ListaVehiculos[i].Placa
+
                                                     </strong>?
 
                                                 </div>
@@ -218,12 +226,13 @@
 
                                                     </button>
 
+                                                    <!-- ELIMINAR CON TOKEN -->
                                                     <form method="post"
                                                           asp-page-handler="Eliminar">
 
                                                         <input type="hidden"
-                                                               name="id"
-                                                               value="@Model.ListaVehiculos[i].Id" />
+                                                               name="token"
+                                                               value="@Model.GenerarToken(Model.ListaVehiculos[i].Id)" />
 
                                                         <button type="submit"
                                                                 class="btn btn-danger">
